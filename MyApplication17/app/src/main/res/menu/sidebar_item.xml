@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="어플리케이션">
+        <menu>
+            <item
+                android:id="@+id/first_sidebar_item"
+                android:title="공지사항"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="개발자">
+        <menu>
+            <item
+                android:id="@+id/second_sidebar_item"
+                android:title="회원 정보수정"
+                android:icon="@android:drawable/ic_menu_edit">
+
+            </item>
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="사진">
+        <menu>
+            <item
+                android:id="@+id/academy_first_people"
+                android:title="1기 학회원"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/academy_second_people"
+                android:title="2기 학회원"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/academy_third_people"
+                android:title="3기 학회원"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/academy_fourth_people"
+                android:title="4기 학회원"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/academy_fifth_people"
+                android:title="5기 학회원"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/academy_sixth_people"
+                android:title="6기 학회원"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+        </menu>
+
+    </item>
+
+</menu>

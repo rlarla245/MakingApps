@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:gravity="center"
+    android:layout_height="match_parent">
+
+    <!--메인 레이아웃에서 설정한 recyclerview에 할당시킬 아이템들을 설정하는 레이아웃 입니다-->
+
+    <ImageView
+        android:id="@+id/recyclerview_imageview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+</RelativeLayout>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Academy Members">
+        <menu>
+            <item
+                android:id="@+id/firstactivity_first_sidebar_item"
+                android:title="1기"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+            <item
+                android:id="@+id/firstactivity_second_sidebar_item"
+                android:title="2기"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+            <item
+                android:id="@+id/firstactivity_third_sidebar_item"
+                android:title="3기"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+            <item
+                android:id="@+id/firstactivity_fourth_sidebar_item"
+                android:title="4기"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+            <item
+                android:id="@+id/firstactivity_fifth_sidebar_item"
+                android:title="5기"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+            <item
+                android:id="@+id/firstactivity_sixth_sidebar_item"
+                android:title="6기"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="Academy Web Page">
+        <menu>
+            <item
+                android:id="@+id/firstactivity_seventh_sidebar_item"
+                android:title="학회 웹사이트"
+                android:icon="@android:drawable/ic_menu_send">
+
+            </item>
+        </menu>
+    </item>
+
+</menu>

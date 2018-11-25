@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".SignUpActivity">
+
+    <ImageView
+        android:id="@+id/signupactivity_imageview"
+        android:layout_width="240dp"
+        android:layout_height="100dp"
+        android:src="@drawable/gallery" />
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:text="채팅방 설정을 위한 사진이 필요합니다."
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_marginTop="10dp"
+        android:textColorHint="#ffffff"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/signup_edittext_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="이메일"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff" />
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:textColorHint="#ffffff"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/signup_edittext_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="아이디(기수 + 이름)"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="240dp"
+        android:textColorHint="#ffffff"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/signup_edittext_password"
+            android:hint="비밀번호(6자리 이상)"
+            android:inputType="numberPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="240dp"
+        android:textColorHint="#ffffff"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/signup_edittext_phonenumber"
+            android:hint="휴대폰번호"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:foreground="?attr/selectableItemBackground"
+        android:id="@+id/signupactivity_button_signup"
+        android:text="회원가입 완료"
+        android:layout_marginTop="5dp"
+        android:background="#ffffff"
+        android:layout_width="240dp"
+        android:layout_height="40dp" />
+
+</LinearLayout>

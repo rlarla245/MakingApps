@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="선택을 시작하겠습니까?"
+        android:textColor="#000000"
+        android:textSize="20dp" />
+
+    <Switch
+        android:id="@+id/mainactivity_switch_androidversion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="시작함"
+        android:textColor="#000000" />
+
+    <LinearLayout
+        android:id="@+id/mainactivity_linearlayout_androidversion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/mainactivitiy_textview_androidversion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="좋아하는 안드로이드 버전은?"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+
+        <RadioGroup
+            android:id="@+id/mainactivity_radiogroup_radiobuttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+
+            <RadioButton
+                android:id="@+id/mainactivity_radiobutton_lollypop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="롤리팝(5.0)" />
+
+            <RadioButton
+                android:id="@+id/mainactivity_radiobutton_mashimellow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="마시멜로(6.0)" />
+
+            <RadioButton
+                android:id="@+id/mainactivity_radiobutton_nuga"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="누가(7.0)" />
+        </RadioGroup>
+
+        <ImageView
+            android:id="@+id/mainactivity_imageview_androidimage"
+            android:layout_width="200dp"
+            android:layout_height="200dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mainactivity_linearlayout_buttons"
+        android:visibility="invisible"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/mainactivity_button_exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="종료" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/mainactivity_button_return"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="처음으로" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/mainactivity_button_rotation"
+            android:text="회전하기"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

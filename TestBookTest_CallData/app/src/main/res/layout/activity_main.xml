@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/mainactivity_button_loadcalldata"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="통화 기록 불러오기"
+        android:textColor="#000000" />
+
+    <ListView
+        android:id="@+id/mainactivity_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
+
+    </ListView>
+
+
+</LinearLayout>

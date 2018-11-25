@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:background="#ffffff"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Toolbar -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_alignParentTop="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:contentInsetStart="0dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/logo_title" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:id="@+id/toolbar_division"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/my_toolbar"
+        android:background="@color/colorDivision"
+        android:orientation="horizontal" />
+
+    <!-- Contents -->
+
+    <ImageView
+        android:background="#ffffff"
+        android:id="@+id/commentactivity_imageview_image"
+        android:layout_below="@+id/toolbar_division"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />
+
+    <LinearLayout
+        android:id="@+id/imageview_division"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/commentactivity_imageview_image"
+        android:background="@color/colorDivision"
+        android:orientation="horizontal" />
+
+    <!--below 코드 변경해야함 -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/comment_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/commentactivity_relativewlayout_send"
+        android:layout_below="@+id/imageview_division"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp" />
+
+    <RelativeLayout
+        android:id="@+id/commentactivity_relativewlayout_send"
+        android:background="#ffffff"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/comment_btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/send"
+            android:theme="@style/ButtonStyle"
+            android:layout_alignParentRight="true" />
+
+        <EditText
+            android:id="@+id/comment_edit_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_toLeftOf="@id/comment_btn_send" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

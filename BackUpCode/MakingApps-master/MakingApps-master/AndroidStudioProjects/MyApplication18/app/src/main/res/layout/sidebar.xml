@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorPrimary"
+    android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:layout_height="60dp">
+
+    <ImageView
+        android:id="@+id/sidebar_imageview"
+        android:src="@android:drawable/ic_menu_myplaces"
+        android:layout_margin="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_toRightOf="@+id/sidebar_imageview"
+        android:text="rlarla3506@gmail.com"
+        android:textColor="#ffffff"
+        android:id="@+id/sidebar_textview_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

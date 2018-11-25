@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "906969347486",
+    "firebase_url": "https://ssma-6e91a.firebaseio.com",
+    "project_id": "ssma-6e91a",
+    "storage_bucket": "ssma-6e91a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906969347486:android:aae32411c877538b",
+        "android_client_info": {
+          "package_name": "com.ssma.serverapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906969347486-1ms7v1jdkpqu208rolutam1ra90h40f0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ssma.serverapp",
+            "certificate_hash": "4355c45b27f82130001f87d440d348ae37ab9670"
+          }
+        },
+        {
+          "client_id": "906969347486-vduobgql6bn8cdsq6e59faji0iteaj1b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA53peezb37UX6q6wdvA7Kie-plrQq9x1w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "906969347486-vduobgql6bn8cdsq6e59faji0iteaj1b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

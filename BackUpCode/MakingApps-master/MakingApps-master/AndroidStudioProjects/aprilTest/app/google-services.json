@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "101260779312",
+    "firebase_url": "https://apriltest-a8cad.firebaseio.com",
+    "project_id": "apriltest-a8cad",
+    "storage_bucket": "apriltest-a8cad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101260779312:android:3a69f0b3547d5bbd",
+        "android_client_info": {
+          "package_name": "ssma.apriltest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101260779312-2jp1d54dc4bbgssp0buvop006tabqntb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ssma.apriltest",
+            "certificate_hash": "4355c45b27f82130001f87d440d348ae37ab9670"
+          }
+        },
+        {
+          "client_id": "101260779312-bbng9ue0djnnrjla6r0t8um6ol4e070j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDelwDDlyy61zaP3YgM_40lFjOkh5yGJvw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101260779312-bbng9ue0djnnrjla6r0t8um6ol4e070j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

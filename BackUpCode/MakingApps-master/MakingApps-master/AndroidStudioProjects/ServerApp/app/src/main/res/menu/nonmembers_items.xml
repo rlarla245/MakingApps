@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Academy History">
+        <menu>
+            <item
+                android:id="@+id/nonmember_first_sidebar_item"
+                android:title="2013년"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+            <item
+                android:id="@+id/nonmember_second_sidebar_item"
+                android:title="2014년"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+            <item
+                android:id="@+id/nonmember_third_sidebar_item"
+                android:title="2015년"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+            <item
+                android:id="@+id/nonmember_fourth_sidebar_item"
+                android:title="2016년"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+            <item
+                android:id="@+id/nonmember_fifth_sidebar_item"
+                android:title="2017년"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+            <item
+                android:id="@+id/nonmember_sixth_sidebar_item"
+                android:title="2018년"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="Academy Web Page">
+        <menu>
+            <item
+                android:id="@+id/nonmember_seventh_sidebar_item"
+                android:title="학회 웹사이트"
+                android:icon="@android:drawable/ic_menu_send">
+
+            </item>
+        </menu>
+    </item>
+
+</menu>

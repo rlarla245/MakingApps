@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Application">
+        <menu>
+            <item
+                android:title="공지사항"
+                android:id="@+id/first_item"
+                android:icon="@android:drawable/ic_menu_agenda">
+            </item>
+
+            <item
+                android:title="사진"
+                android:id="@+id/second_item"
+                android:icon="@android:drawable/ic_menu_gallery">
+            </item>
+
+            <item
+                android:title="정보수정"
+                android:id="@+id/third_item"
+                android:icon="@android:drawable/ic_menu_edit">
+            </item>
+        </menu>
+    </item>
+
+
+
+    <item android:title="preference">
+        <menu>
+            <item
+                android:title="환경설정"
+                android:id="@+id/fourth_item"
+                android:icon="@android:drawable/ic_menu_preferences">
+            </item>
+        </menu>
+    </item>
+</menu>

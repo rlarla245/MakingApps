@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.user.fragment3.SecondActivity">
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/second_drawerlayout"
+        android:background="#818080"
+        android:layout_weight="9.3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include
+                    layout="@layout/toolbar"/>
+
+            </android.support.design.widget.AppBarLayout>
+
+            <FrameLayout
+                android:id="@+id/main_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="236dp"
+                        android:text="홍길동님"
+                        android:textColor="#ffffff"
+                        android:textSize="18sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.498"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/secondA_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="로그인에 성공하셨습니다."
+                        android:textColor="#ffffff"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/user_name"
+                        app:layout_constraintVertical_bias="0.058" />
+
+                    <Button
+                        android:id="@+id/logout_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="#ffffff"
+                        android:text="로그아웃"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/permission_button"
+                        app:layout_constraintEnd_toStartOf="@+id/permission_button"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <Button
+                        android:id="@+id/permission_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="12dp"
+                        android:backgroundTint="#ffffff"
+                        android:text="사진 촬영"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/logout_button"
+                        app:layout_constraintTop_toBottomOf="@+id/secondA_text" />
+
+                    <Button
+                        android:id="@+id/push_alarm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginTop="14dp"
+                        android:backgroundTint="#ffffff"
+                        android:text="푸시 알람"
+                        app:layout_constraintStart_toStartOf="@+id/logout_button"
+                        app:layout_constraintTop_toBottomOf="@+id/logout_button" />
+
+                    <Button
+                        android:id="@+id/google_map_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#ffffff"
+                        android:text="구글 맵"
+                        app:layout_constraintBottom_toBottomOf="@+id/push_alarm"
+                        app:layout_constraintEnd_toEndOf="@+id/permission_button"
+                        app:layout_constraintStart_toStartOf="@+id/permission_button"
+                        app:layout_constraintTop_toTopOf="@+id/push_alarm" />
+
+                </android.support.constraint.ConstraintLayout>
+
+            </FrameLayout>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <android.support.design.widget.NavigationView
+            android:layout_gravity="start"
+            android:id="@+id/second_navigationview"
+            app:headerLayout="@layout/sidebar"
+            app:menu="@menu/sidebar_setttings"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/sidebar"/>
+
+        </android.support.design.widget.NavigationView>
+
+    </android.support.v4.widget.DrawerLayout>
+
+    <LinearLayout
+        android:layout_weight="0.7"
+        android:background="#d1d1d1"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:id="@+id/button1"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:background="@drawable/press_effect"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:src="@drawable/ic_account_circle_black_24dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button2"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:background="@drawable/press_effect"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:src="@drawable/i_5"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button3"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:background="@drawable/press_effect"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:src="@drawable/i_4"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button4"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:background="@drawable/press_effect"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:src="@drawable/i_2"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button5"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:background="@drawable/press_effect"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:src="@drawable/i_3"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

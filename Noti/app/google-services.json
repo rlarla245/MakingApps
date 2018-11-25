@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "745931591709",
+    "firebase_url": "https://delete-a125e.firebaseio.com",
+    "project_id": "delete-a125e",
+    "storage_bucket": "delete-a125e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745931591709:android:5f894c9d0d2b831c",
+        "android_client_info": {
+          "package_name": "com.example.user.noti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "745931591709-bh2c9ok6fgdhio1pn3b04l1o1lnoehtq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK-5RZwbio97YdKNUxSZ0_f79YnxoqY60"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

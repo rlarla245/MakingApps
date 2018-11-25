@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <ImageView
+        android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
+        android:src="@android:drawable/ic_menu_myplaces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_gravity="center"
+        android:id="@+id/email_address_sidebar"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_marginLeft="5dp"
+        android:text="rlarla3506@gmail.com"
+        android:textSize="16sp"
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

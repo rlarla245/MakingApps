@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.user.noti.MainActivity">
+
+    <Button
+        android:id="@+id/simple_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="80dp"
+        android:text="푸쉬 알림"
+        android:textColor="#000000"
+        app:layout_constraintBaseline_toBaselineOf="@+id/specific_notification"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/multi_view_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="다중 창"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="@+id/specific_notification"
+        app:layout_constraintTop_toBottomOf="@+id/specific_notification" />
+
+    <Button
+        android:id="@+id/specific_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="80dp"
+        android:layout_marginTop="64dp"
+        android:text="상세 알림"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/plus_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알림 쌓기"
+        android:textColor="#000000"
+        app:layout_constraintBaseline_toBaselineOf="@+id/multi_view_notification"
+        app:layout_constraintStart_toStartOf="@+id/simple_notification" />
+
+</android.support.constraint.ConstraintLayout>

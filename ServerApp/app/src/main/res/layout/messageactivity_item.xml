@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/messageactivity_item_linearlayout_main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/messageactivity_item_linearlayout"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/messageactivity_item_imageview"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp" />
+
+        <TextView
+            android:id="@+id/messageactivity_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="이름"
+            android:textColor="#000000"
+            android:textSize="12dp" />
+
+    </LinearLayout>
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_toRightOf="@+id/messageactivity_item_linearlayout"
+            android:id="@+id/messageactivity_item_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="메시지"
+            android:textColor="#000000"
+            android:textSize="15dp" />
+
+            <TextView
+                android:layout_marginTop="2dp"
+                android:layout_toRightOf="@+id/messageactivity_item_linearlayout"
+                android:layout_below="@+id/messageactivity_item_textview"
+                android:text="1"
+                android:id="@+id/messageactivity_item_textview_readCounter_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:textColor="@android:color/holo_orange_light"
+                android:textSize="9dp"
+                android:visibility="invisible" />
+
+            <TextView
+                android:layout_below="@+id/messageactivity_item_textview"
+                android:layout_toRightOf="@+id/messageactivity_item_textview_readCounter_left"
+                android:id="@+id/messageactivity_item_textview_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2018.05.07"
+                android:layout_marginTop="2dp"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="9dp" />
+
+            <TextView
+                android:layout_below="@+id/messageactivity_item_textview"
+                android:layout_toRightOf="@+id/messageactivity_item_textview_timestamp"
+                android:text="1"
+                android:id="@+id/messageactivity_item_textview_readCounter_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
+                android:textColor="@android:color/holo_orange_light"
+                android:textSize="9dp"
+                android:visibility="invisible" />
+
+</RelativeLayout>

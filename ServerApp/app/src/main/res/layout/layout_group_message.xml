@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Chat.GroupMessageActivity">
+
+    <LinearLayout
+        android:background="#000000"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize">
+
+        <TextView
+            android:id="@+id/groupmessageactivity_textview_who"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:id="@+id/groupmessageactivity_recyclerview"
+        android:layout_above="@+id/groupmessageactivity_relativelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:id="@+id/groupmessageactivity_relativelayout"
+        android:layout_alignParentBottom="true"
+        android:background="#dddddd"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp">
+
+        <Button
+            android:layout_margin="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/groupmessageactivity_inputbutton"
+            android:background="#000000"
+            android:text="전송"
+            android:textColor="#ffffff"
+            android:textSize="16dp"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:backgroundTint="#000000"
+            android:hint="메시지를 입력해주세요."
+            android:layout_toLeftOf="@id/groupmessageactivity_inputbutton"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/groupmessageactivity_inputtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

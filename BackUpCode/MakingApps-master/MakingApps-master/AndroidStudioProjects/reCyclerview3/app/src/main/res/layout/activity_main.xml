@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3e3e3e"
+    tools:context="com.example.user.recyclerview.MainActivity">
+
+    <!--메인 레이아웃에 내가 원하는 RecyclerView를 배정해줍니다.-->
+    <android.support.v7.widget.RecyclerView
+        android:background="#ffffff"
+        android:layout_margin="10dp"
+        android:id="@+id/main_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+</android.support.constraint.ConstraintLayout>

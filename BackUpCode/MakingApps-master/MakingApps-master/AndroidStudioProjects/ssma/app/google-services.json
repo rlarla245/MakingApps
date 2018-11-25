@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1050579741395",
+    "firebase_url": "https://talkplus-8d545.firebaseio.com",
+    "project_id": "talkplus-8d545",
+    "storage_bucket": "talkplus-8d545.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050579741395:android:1ba15cb3e89ed588",
+        "android_client_info": {
+          "package_name": "com.example.user.fragment3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1050579741395-10bf3tqf9p0ar522ojk9s07m02fejvom.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.fragment3",
+            "certificate_hash": "4355c45b27f82130001f87d440d348ae37ab9670"
+          }
+        },
+        {
+          "client_id": "1050579741395-kvm0crgkmaf852orekc48o8a5tsdskm6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8cJBhR8iglFhbLMmuTKCYnD51QSr1Ox8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1050579741395-kvm0crgkmaf852orekc48o8a5tsdskm6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="서비스 전략경영학회">
+
+        <menu>
+            <item
+                android:id="@+id/notification"
+                android:title="공지사항"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+            <item
+                android:id="@+id/academy_event"
+                android:title="학회 소식"
+                android:icon="@android:drawable/ic_menu_edit">
+
+            </item>
+        </menu>
+
+    </item>
+
+    <item
+        android:title="Peoples">
+        <menu>
+            <item
+                android:id="@+id/first_peoples"
+                android:title="1기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/second_peoples"
+                android:title="2기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/third_peoples"
+                android:title="3기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/fourth_peoples"
+                android:title="4기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/fifth_peoples"
+                android:title="5기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="Easter Egg">
+
+        <menu>
+            <item
+                android:id="@+id/fun_activity"
+                android:title="Fun Activity"
+                android:icon="@android:drawable/ic_menu_preferences">
+
+            </item>
+
+            <item
+                android:id="@+id/developr_information"
+                android:title="개발자 정보"
+                android:icon="@android:drawable/ic_search_category_default">
+
+            </item>
+
+        </menu>
+
+    </item>
+
+</menu>

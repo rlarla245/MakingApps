@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Application">
+        <menu>
+            <item
+                android:id="@+id/first_sidebar_item"
+                android:icon="@android:drawable/ic_menu_agenda"
+                android:title="공지사항">
+
+            </item>
+
+            <item
+                android:id="@+id/second_sidebar_item"
+                android:icon="@android:drawable/ic_menu_edit"
+                android:title="회원정보수정">
+
+            </item>
+        </menu>
+    </item>
+
+    <item
+        android:title="Preference">
+        <menu>
+            <item
+                android:id="@+id/third_sidebar_item"
+                android:icon="@android:drawable/ic_menu_preferences"
+                android:title="환경설정">
+
+            </item>
+        </menu>
+
+    </item>
+
+    <item
+        android:title="사진">
+        <menu>
+            <item
+                android:id="@+id/picture_of_academy"
+                android:icon="@android:drawable/ic_menu_gallery"
+                android:title="1기">
+
+            </item>
+        </menu>
+
+    </item>
+
+</menu>

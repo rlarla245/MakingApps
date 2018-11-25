@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".LoginActivity">
+
+    <ImageView
+        android:layout_width="240dp"
+        android:layout_height="100dp"
+        android:src="@drawable/academy_logo" />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_marginTop="10dp"
+        android:textColorHint="#ffffff"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/loginactivity_edittext_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="이메일"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="240dp"
+        android:textColorHint="#ffffff"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/loginactivity_edittext_password"
+            android:hint="비밀번호"
+            android:inputType="numberPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textColorHint="#ffffff"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:foreground="?attr/selectableItemBackground"
+        android:id="@+id/loginactivity_button_login"
+        android:text="비회원 접속 / 회원 로그인"
+        android:layout_marginTop="10dp"
+        android:background="#ffffff"
+        android:layout_width="240dp"
+        android:layout_height="40dp" />
+
+    <Button
+        android:foreground="?attr/selectableItemBackground"
+        android:id="@+id/loginactivity_button_signup"
+        android:text="회원가입"
+        android:layout_marginTop="5dp"
+        android:background="#ffffff"
+        android:layout_width="240dp"
+        android:layout_height="40dp" />
+
+
+
+</LinearLayout>

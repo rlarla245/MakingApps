@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <android.support.v7.widget.Toolbar
+        android:background="#2b2b2b"
+        android:id="@+id/toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+        <TextView
+            android:layout_gravity="center"
+            android:text="공지사항"
+            android:textColor="#ffffff"
+            android:textSize="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:foreground="?attr/selectableItemBackground"
+            android:id="@+id/toolbar_email"
+            android:layout_gravity="right"
+            android:layout_marginRight="15dp"
+            android:background="@android:drawable/ic_dialog_email"
+            android:backgroundTint="#ffffff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+
+</LinearLayout>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:gravity="center"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ShowBoardContentsActivity">
+
+    <android.support.constraint.ConstraintLayout
+        android:background="#ffffff"
+        android:layout_weight="6"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <TextView
+            android:id="@+id/showboardactivity_textview_titletextview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:text="프로토타입 게시판 제목입니다."
+            android:textColor="#000000"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/showboardactivity_textview_timestamp" />
+
+        <TextView
+            android:id="@+id/showboardactivity_textview_contenttextview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="15dp"
+            android:text="내용입니다.\n반갑습니다. 서비스 전략경영학회(SSMA)입니다.
+            \n문의사항은 관리자 계정으로 연락바랍니다.\n\n관리자: 1기 김두현(호텔경영, 영문)\n전화번호: 010-5004-3106"
+            android:textColor="#000000"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/showboardactivity_textview_titletextview"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/showboardactivity_textview_boardwritername"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
+            android:text="작성자 이름"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/showboardactivity_imageview_boardwriterimage"
+            app:layout_constraintTop_toTopOf="@+id/showboardactivity_imageview_boardwriterimage" />
+
+        <ImageView
+            android:id="@+id/showboardactivity_imageview_boardwriterimage"
+            android:layout_width="52dp"
+            android:layout_height="47dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/ic_menu_myplaces" />
+
+        <TextView
+            android:id="@+id/showboardactivity_textview_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
+            android:text="2018.08.08 16:03"
+            app:layout_constraintBottom_toBottomOf="@+id/showboardactivity_imageview_boardwriterimage"
+            app:layout_constraintStart_toEndOf="@+id/showboardactivity_imageview_boardwriterimage" />
+
+        <ImageView
+            android:id="@+id/showboardactivity_imageview_likestar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/showboardactivity_textview_countlikestar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/showboardactivity_textview_boardwritername"
+            app:srcCompat="@drawable/no_star" />
+
+        <TextView
+            android:id="@+id/showboardactivity_textview_countlikestar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/showboardactivity_textview_timestamp"
+            app:layout_constraintEnd_toEndOf="@+id/showboardactivity_imageview_likestar"
+            app:layout_constraintStart_toStartOf="@+id/showboardactivity_imageview_likestar" />
+    </android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:background="#efefef"
+        android:layout_width="match_parent"
+        android:layout_height="7dp">
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:background="#ffffff"
+        android:layout_marginTop="1dp"
+        android:id="@+id/showboardactivity_recyclerview"
+        android:layout_weight="3.3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:layout_marginTop="1dp"
+        android:background="#efefef"
+        android:orientation="horizontal"
+        android:layout_weight="0.7"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <EditText
+            android:textColorHighlight="#efefef"
+            android:id="@+id/showboardactivity_edittext_commentedittext"
+            android:layout_toLeftOf="@+id/showboardactivity_button_commentuploadbutton"
+            android:hint="댓글을 입력해주세요."
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!--suppress AndroidDomInspection -->
+        <ImageButton
+            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/sendimage"
+            android:textColor="#ffffff"
+            android:id="@+id/showboardactivity_button_commentuploadbutton"
+            android:layout_alignParentRight="true"
+            android:layout_width="43dp"
+            android:layout_height="43dp" />
+
+    </RelativeLayout>
+
+</LinearLayout>

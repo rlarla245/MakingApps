@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="서비스 전략경영학회">
+        <menu>
+            <item
+                android:id="@+id/first_peoples"
+                android:title="1기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/second_peoples"
+                android:title="2기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/third_peoples"
+                android:title="3기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/fourth_peoples"
+                android:title="4기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+            <item
+                android:id="@+id/fifth_peoples"
+                android:title="5기"
+                android:icon="@android:drawable/ic_menu_gallery">
+
+            </item>
+
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="연혁">
+        <menu>
+            <item
+                android:id="@+id/year2013"
+                android:title="2013년"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+            <item
+                android:id="@+id/year2014"
+                android:title="2014년"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+            <item
+                android:id="@+id/year2015"
+                android:title="2015년"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+            <item
+                android:id="@+id/year2016"
+                android:title="2016년"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+            <item
+                android:id="@+id/year2017"
+                android:title="2017년"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+            <item
+                android:id="@+id/year2018"
+                android:title="2018년"
+                android:icon="@android:drawable/ic_menu_agenda">
+
+            </item>
+
+        </menu>
+
+    </item>
+
+    <item
+        android:title="Easter Egg">
+
+        <menu>
+            <item
+                android:id="@+id/fun_activity"
+                android:title="Fun Activity"
+                android:icon="@android:drawable/ic_menu_preferences">
+
+            </item>
+
+            <item
+                android:id="@+id/developr_information"
+                android:title="개발자 정보"
+                android:icon="@android:drawable/ic_search_category_default">
+
+            </item>
+
+        </menu>
+
+    </item>
+
+</menu>

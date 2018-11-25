@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <DatePicker
+        android:id="@+id/mainactivity_datepicker_datepick"
+        android:layout_gravity="center_horizontal"
+        android:datePickerMode="spinner"
+        android:scaleY="0.9"
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+    </DatePicker>
+
+    <EditText
+        android:textAlignment="center"
+        android:background="#d1d1d1"
+        android:layout_marginTop="5dp"
+        android:id="@+id/mainacitvty_edittext_textview"
+        android:layout_width="match_parent"
+        android:layout_height="190dp" />
+
+    <Button
+        android:layout_marginTop="5dp"
+        android:text="버튼"
+        android:background="#ffffff"
+        android:id="@+id/mainactivity_button_filebutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

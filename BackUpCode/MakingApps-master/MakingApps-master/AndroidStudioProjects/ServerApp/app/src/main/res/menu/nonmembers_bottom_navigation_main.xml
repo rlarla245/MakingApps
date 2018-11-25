@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nonMember_FirstLayout_Professor"
+        android:icon="@drawable/ic_account_circle_black_24dp"
+        android:title="Professor"/>
+
+    <item
+        android:id="@+id/nonMember_FirstLayout_Vision"
+        android:icon="@drawable/i_5"
+        android:title="Vision"/>
+
+        <item
+            android:id="@+id/nonMember_FirstLayout_Mission"
+            android:icon="@drawable/i_4"
+            android:title="Mission"/>
+
+        <item
+            android:id="@+id/nonMember_FirstLayout_Curriculum"
+            android:icon="@drawable/i_2"
+            android:title="Curriculum"/>
+
+        <item
+            android:id="@+id/nonMember_FirstLayout_Location"
+            android:icon="@drawable/i_3"
+            android:title="Location"/>
+
+</menu>

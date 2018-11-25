@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.user.notification.MainActivity">
+
+    <Button
+        android:id="@+id/simple_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="84dp"
+        android:text="푸쉬 알람"
+        app:layout_constraintEnd_toStartOf="@+id/specific_notification"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/specific_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="84dp"
+        android:text="상세 알람"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/simple_notification"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/plus_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알림쌓기"
+        app:layout_constraintBaseline_toBaselineOf="@+id/multi_view_notification"
+        app:layout_constraintEnd_toEndOf="@+id/simple_notification"
+        app:layout_constraintStart_toStartOf="@+id/simple_notification" />
+
+    <Button
+        android:id="@+id/multi_view_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:text="다중 창"
+        app:layout_constraintEnd_toEndOf="@+id/specific_notification"
+        app:layout_constraintStart_toStartOf="@+id/specific_notification"
+        app:layout_constraintTop_toBottomOf="@+id/specific_notification" />
+
+    <Button
+        android:id="@+id/individual_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="독립 창"
+        app:layout_constraintEnd_toEndOf="@+id/plus_notification"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/plus_notification"
+        app:layout_constraintTop_toBottomOf="@+id/plus_notification" />
+
+    <Button
+        android:id="@+id/loading1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Load1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/individual_notification"
+        app:layout_constraintStart_toStartOf="@+id/individual_notification"
+        app:layout_constraintTop_toBottomOf="@+id/individual_notification" />
+
+    <Button
+        android:id="@+id/loading2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Load2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/headup"
+        app:layout_constraintStart_toStartOf="@+id/headup"
+        app:layout_constraintTop_toBottomOf="@+id/headup" />
+
+    <Button
+        android:id="@+id/headup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="HeadUp"
+        app:layout_constraintEnd_toEndOf="@+id/multi_view_notification"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/multi_view_notification"
+        app:layout_constraintTop_toBottomOf="@+id/multi_view_notification" />
+
+</android.support.constraint.ConstraintLayout>

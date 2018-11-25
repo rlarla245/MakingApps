@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.user.fragment3">
+
+    <!-- 카메라 사용 권한 불러들이는 코드 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 촬영 동의 -->
+    <uses-feature android:name="android.hardware.Camera" />
+
+    <!-- 외부 저장소에 쓰기 권한 불러들이는 코드 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".SecondActivity" />
+        <activity android:name=".ThirdActivity" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.user.fragment3.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity android:name=".FourthActivity" />
+        <activity
+            android:name=".ResultActivity"
+            android:parentActivityName=".FourthActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".FourthActivity" />
+        </activity>
+        <activity
+            android:name=".FifthActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="" />
+
+        <service android:name=".FirebaseActivity.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCI97SxVIVB1-KL-sY1LKXyMvs2U3zefUM" />
+
+        <activity android:name=".GoogleMapActivities.googleMapActivity" />
+        <activity android:name=".NavigationFragments.Navigation_fragment2"></activity>
+    </application>
+
+</manifest>

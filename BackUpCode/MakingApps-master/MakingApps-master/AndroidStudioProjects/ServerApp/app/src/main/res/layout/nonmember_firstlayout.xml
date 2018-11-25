@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".NonMembers.NonMemberFirstActivity">
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/nonmber_firstlayout_drawerlayout"
+        android:layout_weight="9"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include
+                    layout="@layout/toolbar"/>
+
+            </android.support.design.widget.AppBarLayout>
+
+            <FrameLayout
+                android:background="#ffffff"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:id="@+id/nonMember_FirstLayout_main_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="26dp"
+                        android:text="INTRODUCTION"
+                        android:textColor="#000000"
+                        android:textSize="20dp"
+                        android:id="@+id/nonmember_firstlayout_INTRODUCTION_textview"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/nonmember_firstlayout_INTRODUCTION_textview"
+                        android:layout_marginTop="8dp"
+                        android:layout_centerHorizontal="true"
+                        android:text="학회 소개"
+                        android:textSize="18sp" />
+
+                    <LinearLayout
+                        android:layout_marginTop="50dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="30dp"
+                            android:id="@+id/nonmember_firstlayout_imageview1"
+                            android:layout_width="160dp"
+                            android:layout_height="250dp"
+                            android:src="@drawable/professor" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:text="경희대학교 서비스전략경영학회는\n\n경희대학교 호텔관광대학에서 2013년 서비스 전략경영에 대한\n심화학습 필요를 느낀 학생들이\n순수한 의지와 열정을 가지고\n설립했습니다.\n\n배움에 대한 순수한 가치를\n바탕으로 탁월한 역량과 순수한\n열정을 지니고 꾸준히 성장하는\n서비스전략경영학회는\n학생들의 자발적 의지가\n학회원들과 학교, 사회에 얼마나\n많은 의미있는 공헌을\n할 수 있는지를 보여주는\n모범이라고 생각합니다.\n\n지도교수 강경호"
+                            android:textAlignment="viewEnd"
+                            android:textSize="13dp"
+                            android:layout_marginBottom="5dp"
+                            android:textStyle="bold"
+                            tools:ignore="HardcodedText" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nonmber_firstlayout_navigationview"
+            app:headerLayout="@layout/nonmember_sidebar"
+            app:menu="@menu/nonmembers_items"
+            android:layout_gravity="start"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+        </android.support.design.widget.NavigationView>
+
+    </android.support.v4.widget.DrawerLayout>
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/nonMember_FirstLayout_bottomnavigationview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:itemBackground="@android:color/black"
+            app:itemIconTint="@android:color/white"
+            app:itemTextColor="@android:color/white"
+            app:menu="@menu/nonmembers_bottom_navigation_main">
+
+        </android.support.design.widget.BottomNavigationView>
+
+    </LinearLayout>
+
+</LinearLayout>
+
