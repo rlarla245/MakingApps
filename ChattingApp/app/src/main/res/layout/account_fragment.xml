@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#ffffff"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/accountfragment_imageview_userprofileimage"
+        android:visibility="invisible"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/account" />
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:id="@+id/accountfragment_textview_statusmessage"
+        android:text="Feel So Good"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/accountfragment_linearlayout"
+            android:layout_toRightOf="@+id/accountfragment_imageview_userprofileimage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/accountfragment_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="김두현"
+                android:visibility="invisible"
+                android:textColor="#000000"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/accountfragment_textview_userphonenumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="010-0000-0000"
+                android:visibility="invisible"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="15dp" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_toRightOf="@+id/accountfragment_linearlayout"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/accountfragment_imagebutton_changestatusmessage"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:visibility="invisible"
+            android:background="#ffffff"
+            android:scaleType="centerCrop"
+            android:src="@drawable/change" />
+
+    </RelativeLayout>
+
+</LinearLayout>

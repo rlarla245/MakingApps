@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><!-- START xml_defaults -->
+<defaultsMap>
+    <entry>
+        <key>splash_background</key>
+        <!--#000000 ~ #ffffff-->
+        <value>#000000</value>
+    </entry>
+    <entry>
+        <key>splash_message_caps</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>splash_message</key>
+        <value>서비스 전략경영학회입니다.</value>
+    </entry>
+</defaultsMap><!-- END xml_defaults -->

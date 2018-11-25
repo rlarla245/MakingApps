@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/board_fragment_linearlayout"
+        android:background="#464545"
+        android:layout_width="match_parent"
+        android:gravity="start|center_vertical"
+        android:layout_height="30dp">
+
+        <TextView
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="서비스 전략경영학회(SSMA) 게시판"
+            android:textColor="#ffffff"
+            android:textSize="14dp" />
+
+    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/board_fragment_linearlayout"
+        android:layout_margin="5dp"
+        android:id="@+id/board_fragment_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/board_fragment_uploadfloatingbutton"
+        app:fabSize="normal"
+        android:src="@android:drawable/stat_notify_chat"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

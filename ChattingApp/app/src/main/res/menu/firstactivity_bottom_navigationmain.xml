@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/firstLayout_bottom_chat"
+        android:icon="@drawable/chat"
+        android:title="chat"/>
+
+    <item
+        android:id="@+id/firstLayout_bottom_account"
+        android:icon="@drawable/account"
+        android:title="account"/>
+
+    <item
+        android:id="@+id/firstLayout_bottom_board"
+        android:icon="@drawable/board"
+        android:title="board"/>
+
+</menu>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".FirstActivity">
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/firstActivity_drawerLayout"
+        android:layout_weight="9"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include
+                    layout="@layout/toolbar"/>
+
+            </android.support.design.widget.AppBarLayout>
+
+            <FrameLayout
+                android:background="#ffffff"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:id="@+id/firstActivity_FirstLayout_mainFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </FrameLayout>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/firstActivity_firstLayout_navigationView"
+            app:headerLayout="@layout/firstactivity_sidebar"
+            app:menu="@menu/firstactivity_items"
+            android:layout_gravity="start"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+        </android.support.design.widget.NavigationView>
+
+    </android.support.v4.widget.DrawerLayout>
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/firstLayout_bottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:itemBackground="@android:color/black"
+            app:itemIconTint="@android:color/white"
+            app:itemTextColor="@android:color/white"
+            app:menu="@menu/firstactivity_bottom_navigationmain">
+
+        </android.support.design.widget.BottomNavigationView>
+
+    </LinearLayout>
+
+</LinearLayout>
