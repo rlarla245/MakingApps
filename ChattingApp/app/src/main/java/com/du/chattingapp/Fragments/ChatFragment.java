@@ -39,9 +39,6 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 public class ChatFragment extends Fragment {
-    ArrayList<String> forGetNameOfUsers = new ArrayList<>();
-    // 실제 이름을 담습니다.
-    String nameUsers = new String();
     // Timestamp가 유니코드로 저장되어 있으므로 변환합니다.
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
 
@@ -118,15 +115,27 @@ public class ChatFragment extends Fragment {
             // 상대방 uid를 null값으로 처리합니다.
             String destinationUid = null;
 
+            // 걍 수작업으로 카운트 합시다.
+            int countNumber = 0;
+
             // 챗방에 있는 유저들 체크(키 값만 불러옵니다.)
             for (String user : chatRoomModels.get(position).users.keySet()) {
-                // 내가 아닌 사람을 상대방 uid로 지정
-                if (!user.equals(uid)) {
-                    destinationUid = user;
+                    // 내가 아닌 사람을 상대방 "uid"로 지정
+                    if (!user.equals(uid)) {
+                        if (chatRoomModels.get(position).users.size() > 2) {
+                            if (countNumber < 1) {
+                                countNumber++;
+                                destinationUid = user;
+                                destinationUsers.add(destinationUid);
+                            }
+                        }
 
-                    // 현재 대화하고 있는 유저들을 넣어 봅시다.
-                    destinationUsers.add(destinationUid);
-                }
+                        // count
+                        else {
+                            destinationUid = user;
+                            destinationUsers.add(destinationUid);
+                        }
+                    }
             }
 
             // 현재 1:1 채팅기능에 중점을 뒀었기 때문에 여기서 채팅방의 '마지막 유저'의 이미지 및 이름만 불러오게 되므로
@@ -179,12 +188,11 @@ public class ChatFragment extends Fragment {
                                 CharSequence tests = customViewHolder.temporary_name.getText();
                                 CharSequence test2 = tests.subSequence(0, tests.length() - 2);
                                 customViewHolder.dest_name.setText(test2);
-
                             }
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-
+                                //
                             }
                         });
                     }
@@ -233,6 +241,7 @@ public class ChatFragment extends Fragment {
                     // 1:1 채팅방으로 들어갑니다.
                     else {
                         intent = new Intent(v.getContext(), MessageActivity.class);
+
                         // 여기선 채팅방의 uid값을 보내주는 것이 아니라
                         // 현재 position 값에 있는 상대방의 uid 데이터를 불러옵니다.
                         // 편의상 단체 채팅방은 방 uid로, 1:1 채팅은 상대방 uid로 받아옵니다.

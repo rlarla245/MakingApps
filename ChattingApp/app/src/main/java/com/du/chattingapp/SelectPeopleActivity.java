@@ -64,6 +64,8 @@ public class SelectPeopleActivity extends AppCompatActivity {
                 }
 
                 else {
+                    // 생성하고 채팅방 접속을 바로 하는 것이 아니라 chatFragment에서 접근하므로 이런 식으로
+                    // 코드를 작성해도 정상 작동합니다.
                     Toast.makeText(SelectPeopleActivity.this, "채팅방이 생성되었습니다.", Toast.LENGTH_SHORT).show();
 
                     // 내 uid도 입력해야합니다.

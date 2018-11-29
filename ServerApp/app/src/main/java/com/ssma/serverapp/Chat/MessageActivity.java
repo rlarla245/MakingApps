@@ -437,8 +437,7 @@ public class MessageActivity extends AppCompatActivity {
     // 이를 막기 위해, 기존에 존재하는 채팅방인지 확인하는 메소드를 생성합니다.
     public void checkChatRoom() {
         FirebaseDatabase.getInstance().getReference().child("chatrooms")
-                // 다음 코드가 중복을 확인하는 코드입니다.
-                // 이미 내가 채팅방에 존재하는 경우만 불러옵니다.
+                // 내가 참여하고 있는 모든 채팅방 데이터를 불러옵니다.
                 // 여기서 users는 위에서 생성한 chatModel의 해쉬맵입니다.
                 .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

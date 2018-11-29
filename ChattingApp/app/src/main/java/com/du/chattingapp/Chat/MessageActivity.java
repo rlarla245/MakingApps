@@ -392,7 +392,8 @@ public class MessageActivity extends AppCompatActivity {
 
     // 유저를 누를 경우 자동으로 채팅방이 생성되는 코드입니다,
     public void checkChatRoom() {
-        FirebaseDatabase.getInstance().getReference().child("chatrooms").orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("chatrooms")
+                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // 대화방이 없을 경우 기존 값들을 자동으로 입력 후 넘어갑니다.
@@ -418,6 +419,46 @@ public class MessageActivity extends AppCompatActivity {
                         input_button.setEnabled(true);
                         recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
                         recyclerView.setAdapter(new RecyclerViewAdapter());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void testMethod() {
+        FirebaseDatabase.getInstance().getReference().child("chatrooms")
+                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
+                    // 현재 내가 들어간 모든 채팅방을 불러온 거니까
+                    // 사이즈랑 상대 uid 고려하면 될 듯도 함
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    ChatModel testChatModel = snapshot.getValue(ChatModel.class);
+
+                    // 기존에 나와 상대방이 포함된 채팅방일 경우
+                    if (testChatModel != null && testChatModel.users.size() == 2
+                            && testChatModel.users.containsKey(uid) && testChatModel.users.containsKey(destinationUid)) {
+                        // 메시지 액티비티로 인텐트 넘기면 될 듯?
+                    }
+
+                    // 채팅방이 비었을 경우
+                    else {
+                        ChatModel newRoom = new ChatModel();
+                        newRoom.users.put(uid, true);
+                        newRoom.users.put(destinationUid, true);
+                        FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(newRoom)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //
+                                    }
+                                });
+                        return;
                     }
                 }
             }
