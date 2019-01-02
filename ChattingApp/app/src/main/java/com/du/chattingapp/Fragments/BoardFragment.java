@@ -11,7 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -102,11 +104,13 @@ public class BoardFragment extends Fragment {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         // 게시판 데이터들을 불러옵니다.
                         BoardModel boardModel = snapshot.getValue(BoardModel.class);
-                        boardModelLists.add(boardModel);
+                        if (!snapshot.getKey().equals("comments")) {
+                            boardModelLists.add(boardModel);
 
-                        // 해당 데이터 테이블의 키(uid) 값
-                        String uidKeys = snapshot.getKey();
-                        boardUidsLists.add(uidKeys);
+                            // 해당 데이터 테이블의 키(uid) 값
+                            String uidKeys = snapshot.getKey();
+                            boardUidsLists.add(uidKeys);
+                        }
                     }
                     recyclerViewAdapter.notifyDataSetChanged();
                 }
@@ -127,125 +131,11 @@ public class BoardFragment extends Fragment {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 getFragmentManager().beginTransaction()
+                getFragmentManager().beginTransaction()
                         .replace(R.id.firstActivity_FirstLayout_mainFrame, new BoardUploadFragment()).addToBackStack(BoardUploadFragment.class.getName()).commit();
             }
         });
         return view;
-    }
-
-    // 어댑터 설정
-    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.boardfragment_item, parent, false);
-            return new CustomViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
-            // 시간 불러오기
-            long unixTime = (long) boardModelLists.get(position).timeStamp;
-            Date date = new Date(unixTime);
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
-            String time = simpleDateFormat.format(date);
-
-            ((CustomViewHolder) holder).timeTextView.setText(time);
-
-            // 게시판 제목, 내용 불러오기
-            ((CustomViewHolder) holder).titleTextView.setText(boardModelLists.get(position).boardTitle);
-            ((CustomViewHolder) holder).contentTextView.setText(boardModelLists.get(position).boardDescription);
-
-            // 게시판에 이미지 및 사진 불러오기
-            for (UserModel userModel : boardUserModelLists) {
-                // 게시판 작성자 uid를 기준으로 일치할 경우 프로필 이미지 및 작성자 이름을 불러옵니다.
-                if (userModel.uid.equals(boardModelLists.get(position).boardUid)) {
-                    try {
-                        // 프로필 이미지 불러오기
-                        Glide.with(holder.itemView.getContext())
-                                .load(userModel.profileImageUri)
-                                .apply(new RequestOptions().circleCrop())
-                                .into(((CustomViewHolder) holder).userImageView);
-
-                        // 작성자 이름 불러오기
-                        ((CustomViewHolder) holder).writerTextView.setText(userModel.userName);
-                    } catch (Exception e) {
-//
-                    }
-                }
-            }
-
-            // 좋아요 기능
-            ((CustomViewHolder) holder).starImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onStarClicked(database.getReference().child("board")
-                            // 각 게시물에 접근한다는 뜻입니다.
-                            .child(boardUidsLists.get(position)));
-                }
-            });
-
-            // 해당 게시물에 현재 유저의 uid 값이 있으면 가득 찬 이미지를
-            if (boardModelLists.get(position).boardStars.containsKey(auth.getCurrentUser().getUid())) {
-                ((CustomViewHolder) holder).starImageView
-                        .setImageResource(R.drawable.star);
-                // 없으면 빈 이미지를 출력합니다.
-            } else {
-                ((CustomViewHolder) holder).starImageView
-                        .setImageResource(R.drawable.no_star);
-            }
-
-            // 좋아요 갯수 불러오기
-            int count = boardModelLists.get(position).boardStarCount;
-            ((CustomViewHolder) holder).countTextView.setText(String.valueOf(count));
-
-            // 휴지통 이미지를 누를 경우 삭제 dialog를 띄웁니다.
-            // 물론, 작성자 본인일 경우에만 띄워줘야 겠죠?
-            if (boardModelLists.get(position).boardUid.equals(auth.getCurrentUser().getUid())) {
-                ((CustomViewHolder) holder).deleteImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                        builder.setTitle("확인")
-                                .setMessage("삭제하시겠습니까?")
-                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // 아예 메소드처리를 해버림
-                                        delete_content(position);
-                                        dialog.cancel();
-                                    }
-                                });
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
-                    }
-                });
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return boardModelLists.size();
-        }
-
-        private class CustomViewHolder extends RecyclerView.ViewHolder {
-            TextView titleTextView, writerTextView, timeTextView, countTextView, contentTextView;
-            ImageView starImageView, deleteImageView, userImageView;
-
-            public CustomViewHolder(View view) {
-                super(view);
-                titleTextView = (TextView)view.findViewById(R.id.boardfragment_textview_title);
-                writerTextView = (TextView) view.findViewById(R.id.boardfragment_textview_writername);
-                timeTextView = (TextView) view.findViewById(R.id.boardfragment_textView_time);
-                countTextView = (TextView) view.findViewById(R.id.boardfragment_textview_count);
-                contentTextView = (TextView) view.findViewById(R.id.boardfragment_textview_content);
-                starImageView = (ImageView) view.findViewById(R.id.boardfragment_imageview_star);
-                deleteImageView = (ImageView) view.findViewById(R.id.boardfragment_imageview_delete);
-                userImageView = (ImageView) view.findViewById(R.id.boardfragment_item_uploaderImageView);
-            }
-        }
     }
 
     // 파라미터 값은 해당 게시판 데이터 테이블 값
@@ -304,5 +194,187 @@ public class BoardFragment extends Fragment {
                 }
             }
         });
+    }
+
+    // 어댑터 설정
+    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.boardfragment_item, parent, false);
+            return new CustomViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
+            try {
+                // 시간 불러오기
+                long unixTime = (long) boardModelLists.get(position).timeStamp;
+                Date date = new Date(unixTime);
+                simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+                String time = simpleDateFormat.format(date);
+
+                ((CustomViewHolder) holder).timeTextView.setText(time);
+
+            } catch (NullPointerException e) {
+                //
+            }
+
+            // 게시판 제목, 내용 불러오기
+            ((CustomViewHolder) holder).titleTextView.setText(boardModelLists.get(position).boardTitle);
+            ((CustomViewHolder) holder).contentTextView.setText(boardModelLists.get(position).boardDescription);
+
+            // 게시판에 이미지 및 사진 불러오기
+            for (UserModel userModel : boardUserModelLists) {
+                // 게시판 작성자 uid를 기준으로 일치할 경우 프로필 이미지 및 작성자 이름을 불러옵니다.
+                if (userModel.uid.equals(boardModelLists.get(position).boardUid)) {
+                    try {
+                        // 프로필 이미지 불러오기
+                        Glide.with(holder.itemView.getContext())
+                                .load(userModel.profileImageUri)
+                                .apply(new RequestOptions().circleCrop())
+                                .into(((CustomViewHolder) holder).userImageView);
+
+                        // 작성자 이름 불러오기
+                        ((CustomViewHolder) holder).writerTextView.setText(userModel.userName);
+                    } catch (Exception e) {
+                        //
+                    }
+                }
+            }
+
+            // 좋아요 기능
+            ((CustomViewHolder) holder).starImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onStarClicked(database.getReference().child("board")
+                            // 각 게시물에 접근한다는 뜻입니다.
+                            .child(boardUidsLists.get(position)));
+                }
+            });
+
+            // 해당 게시물에 현재 유저의 uid 값이 있으면 가득 찬 이미지를
+            if (boardModelLists.get(position).boardStars.containsKey(auth.getCurrentUser().getUid())) {
+                ((CustomViewHolder) holder).starImageView
+                        .setImageResource(R.drawable.star);
+                // 없으면 빈 이미지를 출력합니다.
+            } else {
+                ((CustomViewHolder) holder).starImageView
+                        .setImageResource(R.drawable.no_star);
+            }
+
+            // 좋아요 갯수 불러오기
+            int count = boardModelLists.get(position).boardStarCount;
+            ((CustomViewHolder) holder).countTextView.setText(String.valueOf(count));
+
+            try {
+                // 휴지통 이미지를 누를 경우 삭제 dialog를 띄웁니다.
+                // 물론, 작성자 본인일 경우에만 띄워줘야 겠죠?
+                if (boardModelLists.get(position).boardUid.equals(auth.getCurrentUser().getUid())) {
+                    ((CustomViewHolder) holder).deleteImageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                            builder.setTitle("확인")
+                                    .setMessage("삭제하시겠습니까?")
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // 아예 메소드처리를 해버림
+                                            delete_content(position);
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        }
+                    });
+                }
+            } catch (NullPointerException e) {
+
+            }
+
+            ((CustomViewHolder) holder).itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_UP:
+                            break;
+
+                        case MotionEvent.ACTION_DOWN:
+                            //
+                            break;
+
+                        default:
+                            // nothing
+                            break;
+                    }
+
+                    return false;
+                }
+            });
+
+
+            ((CustomViewHolder)holder).itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Fragment fragment = new BoardCommentFragment();
+                    int like;
+
+                    // 값을 넘깁니다.
+                    if (boardModelLists.get(position).boardStars.containsKey(auth.getCurrentUser().getUid())) {
+                        like = 1;
+
+                    } else {
+                        like = 0;
+                    }
+
+                    // 값을 담아 다음 프레그먼트로 넘겨줍시다.
+                    Bundle bundle = new Bundle();
+                    bundle.putString("boardWriterName", ((CustomViewHolder)holder).writerTextView.getText().toString());
+                    bundle.putString("boardTitle", ((CustomViewHolder)holder).titleTextView.getText().toString());
+                    bundle.putString("boardContent", ((CustomViewHolder)holder).contentTextView.getText().toString());
+                    bundle.putString("likeCount", ((CustomViewHolder)holder).countTextView.getText().toString());
+                    bundle.putString("boardPositionUid", boardUidsLists.get(position));
+                    bundle.putInt("likeImageCountNumber", like);
+                    bundle.putInt("boardPositionNumber", position);
+                    bundle.putString("boardWriterUid", boardModelLists.get(position).boardUid);
+                    bundle.putString("date", ((CustomViewHolder)holder).timeTextView.getText().toString());
+
+                    fragment.setArguments(bundle);
+
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.firstActivity_FirstLayout_mainFrame, fragment)
+                            .addToBackStack(BoardCommentFragment.class.getName()).commit();
+
+                }
+            });
+        }
+        // getFragmentManager().beginTransaction()
+        //                                    .replace(R.id.firstActivity_FirstLayout_mainFrame, new BoardCommentFragment()).addToBackStack(BoardCommentFragment.class.getName()).commit();
+        //
+
+        @Override
+        public int getItemCount() {
+            return boardModelLists.size();
+        }
+
+        private class CustomViewHolder extends RecyclerView.ViewHolder {
+            TextView titleTextView, writerTextView, timeTextView, countTextView, contentTextView;
+            ImageView starImageView, deleteImageView, userImageView;
+
+            public CustomViewHolder(View view) {
+                super(view);
+                titleTextView = (TextView) view.findViewById(R.id.boardfragment_textview_title);
+                writerTextView = (TextView) view.findViewById(R.id.boardfragment_textview_writername);
+                timeTextView = (TextView) view.findViewById(R.id.boardfragment_textView_time);
+                countTextView = (TextView) view.findViewById(R.id.boardfragment_textview_count);
+                contentTextView = (TextView) view.findViewById(R.id.boardfragment_textview_content);
+                starImageView = (ImageView) view.findViewById(R.id.boardfragment_imageview_star);
+                deleteImageView = (ImageView) view.findViewById(R.id.boardfragment_imageview_delete);
+                userImageView = (ImageView) view.findViewById(R.id.boardfragment_item_uploaderImageView);
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -134,7 +136,7 @@ public class GroupMessageActivity extends AppCompatActivity {
         });
 
         // 전체 유저 불러오는 듯
-        FirebaseDatabase.getInstance().getReference().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // 데이터 내부 값들을 받아올 수 있는 코드네요.
@@ -142,6 +144,7 @@ public class GroupMessageActivity extends AppCompatActivity {
                 for(DataSnapshot item : dataSnapshot.getChildren()) {
                     // 결국, key - 유저 uid, value - 해당 유저 모델
                     // 결국 모든 유저들을 다 불러오는 메소드
+                    Log.d("키 값", item.getKey());
                     users.put(item.getKey(), item.getValue(UserModel.class));
                 }
                 init();
@@ -161,6 +164,8 @@ public class GroupMessageActivity extends AppCompatActivity {
 
     // 채팅 입력 메소드
     void init() {
+        final ArrayList<String> pushTokens = new ArrayList<>();
+
         input_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,15 +189,18 @@ public class GroupMessageActivity extends AppCompatActivity {
 
                                 // 유저의 uid 값만 불러옵니다.
                                 for (String item : map.keySet()) {
-
                                     // 내 uid면 푸시 보내지 않음
                                     if (item.equals(uid)) {
                                         continue;
                                     }
-                                    else{
-                                        sendGcm(users.get(item).pushToken);
-                                    }
+                                    pushTokens.add(users.get(item).pushToken);
                                 }
+                                for (String tokens : pushTokens) {
+                                    System.out.println("토큰 푸시 메시지 전송 중입니다.....");
+                                    System.out.println("토큰 확인: " + tokens);
+                                    sendGcm(tokens);
+                                }
+                                pushTokens.clear();
                                 editText.setText("");
                             }
 
@@ -208,21 +216,22 @@ public class GroupMessageActivity extends AppCompatActivity {
         });
     }
 
-    // 푸시 메시지 보냅니다.
-    void sendGcm(String pushToken) {
+    void sendGcm(String token) {
         Gson gson = new Gson();
         NotificationModel notificationModel = new NotificationModel();
 
         // 현재 유저 네임으로 메시지를 띄울 때 사용하기 위함입니다.
         String userName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
 
-        notificationModel.to = pushToken;
+        notificationModel.to = token;
         notificationModel.notification.title = userName;
         notificationModel.notification.text = editText.getText().toString();
 
         // 푸시 메시지 출력에 필요한 변수들입니다.
         notificationModel.data.title = userName;
         notificationModel.data.text = editText.getText().toString();
+        notificationModel.data.caseNumber = "1";
+        notificationModel.data.index = destinationRoom;
 
         // 포스트 맨과 같은 바디를 생성했습니다.
         RequestBody requestBody =
@@ -232,7 +241,7 @@ public class GroupMessageActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .header("Content-Type","application/json")
                 // 해당 서버키를 입력합니다.
-                .addHeader("Authorization","key=AIzaSyB1p32ZQJsShRX3hvvw8qmu13Gc7HCSKaM")
+                .addHeader("Authorization","key=AIzaSyCDpcPkE61tZtjVRdO3JoJ9AhWdrqEwzFA")
                 // 이것도 맞는지 확인해야 합니다.
                 .url("https://gcm-http.googleapis.com/gcm/send")
                 .post(requestBody)
@@ -250,7 +259,6 @@ public class GroupMessageActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     // 어댑터 설정

@@ -21,7 +21,6 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".FirstActivity" />
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".NomMembers.NonmemberFirstActivity" />
         <activity android:name=".Chat.MessageActivity" />
         <activity android:name=".SelectPeopleActivity" />
 

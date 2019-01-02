@@ -6,37 +6,37 @@
         <menu>
             <item
                 android:id="@+id/firstActivity_first_sideBar_item"
-                android:title="1기"
+                android:title="1기 학회원"
                 android:icon="@android:drawable/ic_menu_gallery">
             </item>
 
             <item
                 android:id="@+id/firstActivity_second_sideBar_item"
-                android:title="2기"
+                android:title="2기 학회원"
                 android:icon="@android:drawable/ic_menu_gallery">
             </item>
 
             <item
                 android:id="@+id/firstActivity_third_sideBar_item"
-                android:title="3기"
+                android:title="3기 학회원"
                 android:icon="@android:drawable/ic_menu_gallery">
             </item>
 
             <item
                 android:id="@+id/firstActivity_fourth_sideBar_item"
-                android:title="4기"
+                android:title="4기 학회원"
                 android:icon="@android:drawable/ic_menu_gallery">
             </item>
 
             <item
                 android:id="@+id/firstActivity_fifth_sideBar_item"
-                android:title="5기"
+                android:title="5기 학회원"
                 android:icon="@android:drawable/ic_menu_gallery">
             </item>
 
             <item
                 android:id="@+id/firstActivity_sixth_sideBar_item"
-                android:title="6기"
+                android:title="6기 학회원"
                 android:icon="@android:drawable/ic_menu_gallery">
             </item>
 
@@ -45,23 +45,12 @@
     </item>
 
     <item
-        android:title="Academy Web Page">
+        android:title="Web Page">
         <menu>
             <item
                 android:id="@+id/firstActivity_seventh_sideBar_item"
                 android:title="학회 웹사이트"
                 android:icon="@android:drawable/ic_menu_send">
-            </item>
-        </menu>
-    </item>
-
-    <item
-        android:title="Nonmembers Page">
-        <menu>
-            <item
-                android:id="@+id/firstActivity_eighth_sideBar_item"
-                android:title="비회원 페이지로 이동"
-                android:icon="@android:drawable/ic_dialog_info">
             </item>
 
             <item

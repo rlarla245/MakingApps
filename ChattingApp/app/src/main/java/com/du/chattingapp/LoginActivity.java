@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.du.chattingapp.NomMembers.NonmemberFirstActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -29,6 +28,10 @@ public class LoginActivity extends AppCompatActivity {
     // 로그인 확인 메소드
     FirebaseAuth.AuthStateListener authStateListener;
 
+    // FirstActivity로 상대방 uid를 넘겨줍니다.
+    String destiUid;
+    String destiRoomUid;
+
     // 원격으로 버튼 및 배경화면 색 지정할 때 활용할 수 있습니다.
     // public FirebaseRemoteConfig mFirebaseRemoteConfig;
 
@@ -36,6 +39,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // 상대방 uid
+        destiUid = getIntent().getStringExtra("destinationUid");
+
+        // 단체 채팅방
+        destiRoomUid = getIntent().getStringExtra("destinationRoomUid");
 
         // 버튼 및 텍스트 뷰 불러오기
         loginButton = (Button) findViewById(R.id.loginactivity_button_login);
@@ -70,13 +79,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 아이디 칸이 공백이고, 패스워드 칸이 공백일 경우
                 // 비회원 페이지로 이동됩니다.
+
                 if (idTextView.getText().toString().trim().equals("")
                         && passwordTextView.getText().toString().trim().equals("")) {
-                    Intent nonMemberIntent = new Intent(view.getContext(), NonmemberFirstActivity.class);
-                    startActivity(nonMemberIntent);
-                    Toast.makeText(LoginActivity.this, "비회원으로 접속합니다.\n서비스 전략경영학회에 오신 것을 환영합니다!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "입력이 필요합니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
 
                 // 패스워드를 입력하지 않았을 경우
                 if (!idTextView.getText().toString().trim().equals("") && passwordTextView.getText().toString().trim().equals("")) {
@@ -104,7 +113,43 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 // user 변수는 서버에 있는 유저를 받아옵니다.
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
+
+                // 1:1 대화로 넘기기
+                if (getIntent().getStringExtra("caseNumber") != null &&
+                        user != null && getIntent().getStringExtra("caseNumber").equals("0")) {
+                    // 로그인
+                    Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                    Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
+                    firstActivityIntent.putExtra("destinationUid", destiUid);
+                    firstActivityIntent.putExtra("caseNumber", "0");
+                    startActivity(firstActivityIntent);
+                    finish();
+                }
+
+                // 1:多 대화로 넘기기
+                else if (getIntent().getStringExtra("caseNumber") != null &&
+                        user != null && getIntent().getStringExtra("caseNumber").equals("1")) {
+                    // 로그인
+                    Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                    Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
+                    firstActivityIntent.putExtra("destinationRoomUid", destiRoomUid);
+                    firstActivityIntent.putExtra("caseNumber", "1");
+                    startActivity(firstActivityIntent);
+                    finish();
+                }
+
+                // 게시판으로 넘기기
+                else if (getIntent().getStringExtra("caseNumber") != null &&
+                        user != null && getIntent().getStringExtra("caseNumber").equals("2")) {
+                    // 로그인
+                    Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                    Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
+                    firstActivityIntent.putExtra("caseNumber", "2");
+                    startActivity(firstActivityIntent);
+                    finish();
+                }
+
+                else if (user != null) {
                     // 로그인
                     Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                     Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);

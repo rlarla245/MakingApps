@@ -155,6 +155,8 @@ public class MessageActivity extends AppCompatActivity {
         // 푸시 메시지 출력에 필요한 변수들입니다.
         notificationModel.data.title = userName;
         notificationModel.data.text = input_text.getText().toString();
+        notificationModel.data.caseNumber = "0";
+        notificationModel.data.index = destinationUid;
 
         // 포스트 맨과 같은 바디를 생성했습니다.
         RequestBody requestBody =

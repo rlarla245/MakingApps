@@ -48,7 +48,7 @@
     <Button
         android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/loginactivity_button_login"
-        android:text="비회원 접속 / 회원 로그인"
+        android:text="회원 로그인"
         android:layout_marginTop="10dp"
         android:background="#ffffff"
         android:theme="@style/ButtonStyle"

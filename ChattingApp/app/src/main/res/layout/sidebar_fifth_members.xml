@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/sidebar_fifthmemeber_linearlayout"
+        android:background="#464545"
+        android:layout_width="match_parent"
+        android:gravity="start|center_vertical"
+        android:layout_height="30dp">
+
+        <TextView
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="서비스 전략경영학회(SSMA) 5기"
+            android:textColor="#ffffff"
+            android:textSize="14dp" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/sidebar_fifthmemeber_linearlayout"
+        android:layout_margin="5dp"
+        android:id="@+id/sidebar_fifthmember_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+</RelativeLayout>

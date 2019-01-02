@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?android:attr/selectableItemBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:layout_margin="2dp"
+    tools:layout_editor_absoluteY="25dp">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/sidebar_firstmember_imageview"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/academy_logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/sidebar_firstmember_textview_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:inputType="textMultiLine"
+                android:singleLine="true"
+                android:text="초대 학회장"
+                android:textColor="#000000"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/sidebar_firstmembers_textview_name"
+                app:layout_constraintTop_toBottomOf="@+id/sidebar_firstmembers_textview_name" />
+
+            <TextView
+                android:id="@+id/sidebar_firstmembers_textview_currentstatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:inputType="textMultiLine"
+                android:singleLine="true"
+                android:text="현재 상황"
+                android:textColor="#000000"
+                android:textSize="12dp"
+                app:layout_constraintBottom_toBottomOf="@+id/sidebar_firstmember_imageview"
+                app:layout_constraintStart_toStartOf="@+id/sidebar_firstmember_textview_title"
+                app:layout_constraintTop_toBottomOf="@+id/sidebar_firstmember_textview_title" />
+
+            <TextView
+                android:id="@+id/sidebar_firstmembers_textview_defaultmessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="경희대학교 서비스전략경영학회(SSMA)"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sidebar_firstmember_imageview" />
+
+            <TextView
+                android:id="@+id/sidebar_firstmembers_textview_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="이름"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/sidebar_firstmember_imageview"
+                app:layout_constraintTop_toTopOf="@+id/sidebar_firstmember_imageview" />
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.v7.widget.CardView>
+
+</android.support.constraint.ConstraintLayout>

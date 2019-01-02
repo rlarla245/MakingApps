@@ -12,6 +12,7 @@
         android:layout_height="?android:attr/actionBarSize">
 
         <TextView
+            android:text=""
             android:layout_marginLeft="10dp"
             android:id="@+id/messageactivity_textview_who"
             android:textColor="#ffffff"

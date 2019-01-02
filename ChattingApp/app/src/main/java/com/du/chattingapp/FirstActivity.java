@@ -13,16 +13,20 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.du.chattingapp.Chat.GroupMessageActivity;
+import com.du.chattingapp.Chat.MessageActivity;
 import com.du.chattingapp.Fragments.AccountFragment;
 import com.du.chattingapp.Fragments.BoardFragment;
 import com.du.chattingapp.Fragments.ChatFragment;
 import com.du.chattingapp.Fragments.PeoplesFragment;
-import com.du.chattingapp.NomMembers.NonmemberFirstActivity;
 import com.du.chattingapp.Sidebars.SidebarFifthMembers;
 import com.du.chattingapp.Sidebars.SidebarFirstMembers;
 import com.du.chattingapp.Sidebars.SidebarFourthMembers;
@@ -44,10 +48,19 @@ public class FirstActivity extends AppCompatActivity {
     public ImageButton emailIcon;
     public TextView emailaddress;
 
+    // 이제 MessageActivity로 넘깁시다.
+    String destinationUid;
+
+    // 이제 GroupMessageActivity로 넘깁시다.
+    String destinationRoomUid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+
+        destinationUid = getIntent().getStringExtra("destinationUid");
+        destinationRoomUid = getIntent().getStringExtra("destinationRoomUid");
 
         // 변수 불러오고 로그아웃
         auth = FirebaseAuth.getInstance();
@@ -149,9 +162,11 @@ public class FirstActivity extends AppCompatActivity {
 
                 // TODO
                 // 비회원 페이지로 이동
+                /*
                 if (item.getItemId() == R.id.firstActivity_eighth_sideBar_item) {
                     startActivity(new Intent(navigationView.getContext(), NonmemberFirstActivity.class));
                 }
+                */
 
                 // 로그아웃 기능 - 확인 요망
                 if (item.getItemId() == R.id.firstActivity_nineth_sideBar_item) {
@@ -168,6 +183,26 @@ public class FirstActivity extends AppCompatActivity {
         // 메인 화면 조정
         getFragmentManager().beginTransaction()
                 .replace(R.id.firstActivity_FirstLayout_mainFrame, new PeoplesFragment()).commit();
+
+        // 푸시 메시지 통한 1:1 채팅방 전환
+        if (getIntent().getStringExtra("caseNumber") != null && getIntent().getStringExtra("caseNumber").equals("0")) {
+            Intent intent = new Intent(this, MessageActivity.class);
+            intent.putExtra("destinationUid", destinationUid);
+            startActivity(intent);
+        }
+
+        // 푸시 메시지 통한 1:多 채팅방 전환
+        if (getIntent().getStringExtra("caseNumber") != null && getIntent().getStringExtra("caseNumber").equals("1")) {
+            Intent intent = new Intent(this, GroupMessageActivity.class);
+            intent.putExtra("destinationRoom", destinationRoomUid);
+            startActivity(intent);
+        }
+
+        // 푸시 메시지 통한 게시판 전환
+        if (getIntent().getStringExtra("caseNumber") != null && getIntent().getStringExtra("caseNumber").equals("2")) {
+            getFragmentManager().beginTransaction().replace(R.id.firstActivity_FirstLayout_mainFrame,
+                    new BoardFragment()).addToBackStack(BoardFragment.class.getName()).commit();
+        }
 
         // TODO
         // Bottom NavigationView 호출 및 설정

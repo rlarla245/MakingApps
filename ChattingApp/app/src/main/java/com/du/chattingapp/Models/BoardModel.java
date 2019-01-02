@@ -12,4 +12,13 @@ public class BoardModel {
     public Map<String, Boolean> boardStars = new HashMap<>();
     public Object timeStamp;
 
+    public static class Comment {
+        public String uid;
+        public String userName;
+        public String comment;
+        public Object timestamp;
+        public int boardStarCount = 0;
+        public Map<String, Boolean> boardStars = new HashMap<>();
+    }
+
 }

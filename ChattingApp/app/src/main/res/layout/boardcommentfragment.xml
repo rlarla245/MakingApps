@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    tools:layout_editor_absoluteY="25dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/boardcomment_fragment_cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:background="#f1f1f1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/boardcomment_fragment_ImageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/academy_logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/boardcomment_fragment_textview_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:inputType="textMultiLine"
+                android:text="제목"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/boardcomment_fragment_textView_time"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toEndOf="@+id/boardcomment_fragment_ImageView"
+                app:layout_constraintTop_toTopOf="@+id/boardcomment_fragment_ImageView" />
+
+            <TextView
+                android:id="@+id/boardcomment_fragment_textview_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:inputType="textMultiLine"
+                android:text="내용"
+                android:textAllCaps="false"
+                android:textColor="#000000"
+                android:textSize="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/boardcomment_fragment_ImageView"
+                app:layout_constraintTop_toBottomOf="@+id/boardcomment_fragment_ImageView" />
+
+            <TextView
+                android:id="@+id/boardcomment_fragment_textview_writername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="작성자"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/boardcomment_fragment_textview_title"
+                app:layout_constraintTop_toBottomOf="@+id/boardcomment_fragment_textview_title" />
+
+            <TextView
+                android:id="@+id/boardcomment_fragment_textView_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:text="2018.07.23"
+                android:textSize="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/linearLayout2"
+                app:layout_constraintTop_toTopOf="@+id/boardcomment_fragment_textview_title" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toStartOf="@+id/boardcomment_fragment_imageview_delete"
+                app:layout_constraintTop_toBottomOf="@+id/boardcomment_fragment_textView_time">
+
+                <ImageView
+                    android:id="@+id/boardcomment_fragment_imageview_star"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:layout_constraintBottom_toTopOf="@+id/boardcomment_fragment_textview_count"
+                    app:layout_constraintEnd_toStartOf="@+id/boardcomment_fragment_imageview_delete"
+                    app:layout_constraintTop_toTopOf="@+id/boardcomment_fragment_textview_title"
+                    app:srcCompat="@drawable/no_star" />
+
+                <TextView
+                    android:id="@+id/boardcomment_fragment_textview_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="카운트"
+                    android:textSize="6dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/boardcomment_fragment_textview_writername"
+                    app:layout_constraintEnd_toStartOf="@+id/boardcomment_fragment_imageview_delete"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="@+id/boardcomment_fragment_imageview_star" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/boardcomment_fragment_imageview_delete"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/linearLayout2"
+                app:srcCompat="@android:drawable/ic_menu_delete" />
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/boardcomment_fragment_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/boardcomment_fragment_linearlayout_comment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/boardcomment_fragment_cardview">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/boardcomment_fragment_linearlayout_comment"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginStart="5dp"
+        android:background="#efefef"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <EditText
+                android:hint=""
+                android:backgroundTint="#000000"
+                android:inputType="textMultiLine"
+                android:id="@+id/boardcomment_fragment_edittext_comment"
+                android:layout_margin="2dp"
+                android:layout_toLeftOf="@+id/boardcomment_fragment_button_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!--Base.TextAppearance.AppCompat.Widget.Button.Colored-->
+            <Button
+                android:foreground="?android:attr/selectableItemBackground"
+                android:id="@+id/boardcomment_fragment_button_comment"
+                android:layout_margin="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="#3f3f3f"
+                android:text="댓글 입력"
+                android:textColor="#ffffff"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</android.support.constraint.ConstraintLayout>
