@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -164,10 +165,13 @@ public class ChatFragment extends Fragment {
                             }
                         });
             }
-
             // 단체 채팅방의 경우 어떻게 될지 봅시다.
             else {
-                customViewHolder.profileimage.setImageResource(R.drawable.ssma_push_icon);
+                // 프로필 이미지 불러옵니다.
+                Glide.with(customViewHolder.itemView.getContext())
+                        .load(R.drawable.ssma_push_icon)
+                        .apply(new RequestOptions().circleCrop())
+                        .into(customViewHolder.profileimage);
 
                 // 반복문 돌리고 데이터베이스 접속합니다.
                 for (final String uids : chatRoomModels.get(position).users.keySet()) {

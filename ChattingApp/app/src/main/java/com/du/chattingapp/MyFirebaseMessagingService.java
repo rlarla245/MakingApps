@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.du.chattingapp.Chat.MessageActivity;
 import com.du.chattingapp.Fragments.BoardFragment;
@@ -23,7 +24,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     // 서버에서 메시지 수신 시 작동하는 메소드입니다.
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             String title = remoteMessage.getData().get("title");
             String text = remoteMessage.getData().get("text");
@@ -49,10 +49,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     // 1:1 채팅방으로 이동
     private void sendNotification0(String title, String text, String index) {
-        // 채널 생성 - skd 26? 부터
+        // 채널 생성 - sdk 26? 부터
         // todo
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            // 푸시메시지를 누를 경우 게시판 프레그먼트로 이동합니다.
+            // 푸시메시지를 누를 경우 1:1 채팅방으로 이동합니다.
+            Log.d("Service Act - 오레오 버전 이상", "1:1 채팅방으로 이동합니다.");
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra("caseNumber", "0");
             intent.putExtra("destinationUid", index);
@@ -99,11 +100,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // 채널 생성 - < 26
         else {
-            // 푸시메시지를 누를 경우 로그인 액티비티로 넘어갑니다.
-            // todo
+            Log.d("Service Act - 오레오 버전 이하", "1:1 채팅방으로 이동합니다.");
+            // 푸시메시지를 누를 경우 1:1 채팅방으로 이동합니다.
             Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra("caseNumber", "0");
+            intent.putExtra("destinationUid", index);
+
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                     PendingIntent.FLAG_ONE_SHOT);
 
             Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -114,13 +118,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             .setContentText(text)
                             .setAutoCancel(true)
                             .setSound(defaultSoundUri)
-                            .setVibrate(new long[]{100, 200, 100, 200})
                             .setPriority(Notification.PRIORITY_HIGH)
-                            // 채널 적용
-                            // .setChannelId(ChannerId)
                             .setContentIntent(pendingIntent);
 
-            // 채널 적용
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -133,6 +133,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // 채널 생성 - skd 26? 부터
         // todo
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Log.d("Service Act - 오레오 버전 이상", "1:多 채팅방으로 이동합니다.");
             // 푸시메시지를 누를 경우 게시판 프레그먼트로 이동합니다.
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra("caseNumber", "1");
@@ -180,11 +181,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // 채널 생성 - < 26
         else {
-            // 푸시메시지를 누를 경우 로그인 액티비티로 넘어갑니다.
-            // todo
+            Log.d("Service Act - 오레오 버전 이하", "1:多 채팅방으로 이동합니다.");
+            // 푸시메시지를 누를 경우 게시판 프레그먼트로 이동합니다.
             Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra("caseNumber", "1");
+            intent.putExtra("destinationRoomUid", index);
+
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                     PendingIntent.FLAG_ONE_SHOT);
 
             Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -195,13 +199,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             .setContentText(text)
                             .setAutoCancel(true)
                             .setSound(defaultSoundUri)
-                            .setVibrate(new long[]{100, 200, 100, 200})
                             .setPriority(Notification.PRIORITY_HIGH)
-                            // 채널 적용
-                            // .setChannelId(ChannerId)
                             .setContentIntent(pendingIntent);
 
-            // 채널 적용
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -214,9 +214,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // 채널 생성 - skd 26? 부터
         // todo
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Log.d("Service Act - 오레오 버전 이상", "게시판으로 이동합니다.");
             // 푸시메시지를 누를 경우 게시판 프레그먼트로 이동합니다.
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra("caseNumber", "2");
+
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
@@ -260,11 +262,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // 채널 생성 - < 26
         else {
-            // 푸시메시지를 누를 경우 로그인 액티비티로 넘어갑니다.
-            // todo
+            Log.d("Service Act - 오레오 버전 이하", "게시판으로 이동합니다.");
+            // 푸시메시지를 누를 경우 게시판 프레그먼트로 이동합니다.
             Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra("caseNumber", "2");
+
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                     PendingIntent.FLAG_ONE_SHOT);
 
             Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -275,13 +279,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             .setContentText(text)
                             .setAutoCancel(true)
                             .setSound(defaultSoundUri)
-                            .setVibrate(new long[]{100, 200, 100, 200})
                             .setPriority(Notification.PRIORITY_HIGH)
-                            // 채널 적용
-                            // .setChannelId(ChannerId)
                             .setContentIntent(pendingIntent);
 
-            // 채널 적용
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

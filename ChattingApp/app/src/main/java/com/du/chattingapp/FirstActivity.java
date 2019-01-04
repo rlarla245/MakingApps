@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,9 @@ import com.du.chattingapp.Sidebars.SidebarThirdMembers;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -186,6 +190,7 @@ public class FirstActivity extends AppCompatActivity {
 
         // 푸시 메시지 통한 1:1 채팅방 전환
         if (getIntent().getStringExtra("caseNumber") != null && getIntent().getStringExtra("caseNumber").equals("0")) {
+            Log.d("First Act", "1:1 채팅방 이동");
             Intent intent = new Intent(this, MessageActivity.class);
             intent.putExtra("destinationUid", destinationUid);
             startActivity(intent);
@@ -193,6 +198,7 @@ public class FirstActivity extends AppCompatActivity {
 
         // 푸시 메시지 통한 1:多 채팅방 전환
         if (getIntent().getStringExtra("caseNumber") != null && getIntent().getStringExtra("caseNumber").equals("1")) {
+            Log.d("First Act", "1:多 채팅방 이동");
             Intent intent = new Intent(this, GroupMessageActivity.class);
             intent.putExtra("destinationRoom", destinationRoomUid);
             startActivity(intent);
@@ -200,6 +206,7 @@ public class FirstActivity extends AppCompatActivity {
 
         // 푸시 메시지 통한 게시판 전환
         if (getIntent().getStringExtra("caseNumber") != null && getIntent().getStringExtra("caseNumber").equals("2")) {
+            Log.d("First Act", "게시판 이동");
             getFragmentManager().beginTransaction().replace(R.id.firstActivity_FirstLayout_mainFrame,
                     new BoardFragment()).addToBackStack(BoardFragment.class.getName()).commit();
         }

@@ -1,8 +1,8 @@
 package com.du.chattingapp.Chat;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -41,7 +41,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import okhttp3.Call;
@@ -61,19 +60,15 @@ public class MessageActivity extends AppCompatActivity {
     public String chatRoomUid;
     public RecyclerView recyclerView;
     public TextView with_who_text;
-
+    // 1:1 채팅인지 1:多 채팅인지 확인하는 카운트 변수 입니다.
+    int peopleCount = 0;
     // 연도 – 월 – 일 – 시간 – 분
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
-
     // 유저 데이터 불러오기
     private UserModel destinationUserModel;
-
     // Firebase 관련 메소드 불러오기
     private DatabaseReference databaseReference;
     private ValueEventListener valueEventListener;
-
-    // 1:1 채팅인지 1:多 채팅인지 확인하는 카운트 변수 입니다.
-    int peopleCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,17 +80,17 @@ public class MessageActivity extends AppCompatActivity {
 
         // 변수 호출
         destinationUid = getIntent().getStringExtra("destinationUid");
-        input_button = (Button)findViewById(R.id.messageactivity_inputbutton);
-        input_text = (EditText)findViewById(R.id.messageactivity_inputtext);
+        input_button = (Button) findViewById(R.id.messageactivity_inputbutton);
+        input_text = (EditText) findViewById(R.id.messageactivity_inputtext);
 
         // 상대방 이름을 불러옵니다.
-        with_who_text = (TextView)findViewById(R.id.messageactivity_textview_who);
+        with_who_text = (TextView) findViewById(R.id.messageactivity_textview_who);
 
         // 현재 유저 uid 불러오기
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         // recyclerview 불러오기
-        recyclerView = (RecyclerView)findViewById(R.id.messageactivity_recyclerview);
+        recyclerView = (RecyclerView) findViewById(R.id.messageactivity_recyclerview);
 
         // 전송
         input_button.setOnClickListener(new View.OnClickListener() {
@@ -119,9 +114,7 @@ public class MessageActivity extends AppCompatActivity {
                             input_text.setText("");
                         }
                     });
-                }
-
-                else {
+                } else {
                     // 이미 채팅방이 생성되었을 경우, 그 채팅방의 값을 불러오겠습니다.
                     ChatModel.Comment comment = new ChatModel.Comment();
                     comment.uid = uid;
@@ -143,6 +136,7 @@ public class MessageActivity extends AppCompatActivity {
     // 푸시 메시지를 보내야 합니다.
     void sendGcm() {
         Gson gson = new Gson();
+
         NotificationModel notificationModel = new NotificationModel();
 
         // 현재 유저 네임으로 메시지를 띄울 때 사용하기 위함입니다.
@@ -156,11 +150,12 @@ public class MessageActivity extends AppCompatActivity {
         notificationModel.data.title = userName;
         notificationModel.data.text = input_text.getText().toString();
         notificationModel.data.caseNumber = "0";
-        notificationModel.data.index = destinationUid;
+        notificationModel.data.index = uid;
 
         // 포스트 맨과 같은 바디를 생성했습니다.
         RequestBody requestBody =
-                RequestBody.create(MediaType.parse("application/json; charset=utf8"), gson.toJson(notificationModel));
+                RequestBody.create(MediaType.parse("application/json; charset=utf8"),
+                        gson.toJson(notificationModel));
 
         // 포스트 맨과 같은 헤더 부분입니다.
         Request request = new Request.Builder()
@@ -184,6 +179,98 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    // 유저를 누를 경우 자동으로 채팅방이 생성되는 코드입니다,
+    public void checkChatRoom() {
+        FirebaseDatabase.getInstance().getReference().child("chatrooms")
+                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // 대화방이 없을 경우 기존 값들을 자동으로 입력 후 넘어갑니다.
+                if (dataSnapshot.getValue() == null) {
+                    ChatModel newRoom = new ChatModel();
+                    newRoom.users.put(uid, true);
+                    newRoom.users.put(destinationUid, true);
+                    FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(newRoom)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    checkChatRoom();
+                                }
+                            });
+                    return;
+                }
+
+                for (DataSnapshot item : dataSnapshot.getChildren()) {
+                    ChatModel chatModel = item.getValue(ChatModel.class);
+                    // 채팅방이 기존에 있을 경우
+                    if (chatModel.users.containsKey(destinationUid) && chatModel.users.size() == 2) {
+                        chatRoomUid = item.getKey();
+                        input_button.setEnabled(true);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
+                        recyclerView.setAdapter(new RecyclerViewAdapter());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void testMethod() {
+        FirebaseDatabase.getInstance().getReference().child("chatrooms")
+                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
+            // 현재 내가 들어간 모든 채팅방을 불러온 거니까
+            // 사이즈랑 상대 uid 고려하면 될 듯도 함
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    ChatModel testChatModel = snapshot.getValue(ChatModel.class);
+
+                    // 기존에 나와 상대방이 포함된 채팅방일 경우
+                    if (testChatModel != null && testChatModel.users.size() == 2
+                            && testChatModel.users.containsKey(uid) && testChatModel.users.containsKey(destinationUid)) {
+                        // 메시지 액티비티로 인텐트 넘기면 될 듯?
+                    }
+
+                    // 채팅방이 비었을 경우
+                    else {
+                        ChatModel newRoom = new ChatModel();
+                        newRoom.users.put(uid, true);
+                        newRoom.users.put(destinationUid, true);
+                        FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(newRoom)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //
+                                    }
+                                });
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();
+        // 메시지가 없을 경우 뒤로가기 버튼을 눌러도 틩기지 않습니다.
+        if (valueEventListener != null) {
+            databaseReference.removeEventListener(valueEventListener);
+        }
+
+        finish();
+        // overridePendingTransition(R.anim.fast_fromleft, R.anim.fast_toright);
     }
 
     class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -276,7 +363,7 @@ public class MessageActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-            MessageViewHolder messageViewHolder = ((MessageViewHolder)holder);
+            MessageViewHolder messageViewHolder = ((MessageViewHolder) holder);
 
             with_who_text.setText(destinationUserModel.userName);
 
@@ -292,9 +379,7 @@ public class MessageActivity extends AppCompatActivity {
                 messageViewHolder.linearLayout_main.setGravity(Gravity.RIGHT);
                 messageViewHolder.textview_timestamp.setGravity(Gravity.RIGHT);
                 setReadCounter(position, messageViewHolder.textView_readCounter_left);
-            }
-
-            else {
+            } else {
                 Glide.with(holder.itemView.getContext()).load(destinationUserModel.profileImageUri)
                         // 원형 이미지로 호출
                         .apply(new RequestOptions().circleCrop())
@@ -380,107 +465,15 @@ public class MessageActivity extends AppCompatActivity {
 
             public MessageViewHolder(View view) {
                 super(view);
-                textView_message = (TextView)view.findViewById(R.id.messageactivity_item_textview);
-                textView_name = (TextView)view.findViewById(R.id.messageactivity_item_name);
-                imageview_profile = (ImageView)view.findViewById(R.id.messageactivity_item_imageview);
-                linearLayout_destination = (LinearLayout)view.findViewById(R.id.messageactivity_item_linearlayout);
-                linearLayout_main = (LinearLayout)view.findViewById(R.id.messageactivity_item_linearlayout_main);
-                textview_timestamp = (TextView)view.findViewById(R.id.messageactivity_item_textview_timestamp);
-                textView_readCounter_left = (TextView)view.findViewById(R.id.messageactivity_item_textview_readCounter_left);
-                textView_readCounter_right = (TextView)view.findViewById(R.id.messageactivity_item_textview_readCounter_right);
+                textView_message = (TextView) view.findViewById(R.id.messageactivity_item_textview);
+                textView_name = (TextView) view.findViewById(R.id.messageactivity_item_name);
+                imageview_profile = (ImageView) view.findViewById(R.id.messageactivity_item_imageview);
+                linearLayout_destination = (LinearLayout) view.findViewById(R.id.messageactivity_item_linearlayout);
+                linearLayout_main = (LinearLayout) view.findViewById(R.id.messageactivity_item_linearlayout_main);
+                textview_timestamp = (TextView) view.findViewById(R.id.messageactivity_item_textview_timestamp);
+                textView_readCounter_left = (TextView) view.findViewById(R.id.messageactivity_item_textview_readCounter_left);
+                textView_readCounter_right = (TextView) view.findViewById(R.id.messageactivity_item_textview_readCounter_right);
             }
         }
-    }
-
-    // 유저를 누를 경우 자동으로 채팅방이 생성되는 코드입니다,
-    public void checkChatRoom() {
-        FirebaseDatabase.getInstance().getReference().child("chatrooms")
-                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // 대화방이 없을 경우 기존 값들을 자동으로 입력 후 넘어갑니다.
-                if (dataSnapshot.getValue() == null) {
-                    ChatModel newRoom = new ChatModel();
-                    newRoom.users.put(uid, true);
-                    newRoom.users.put(destinationUid, true);
-                    FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(newRoom)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    checkChatRoom();
-                                }
-                            });
-                    return;
-                }
-
-                for (DataSnapshot item : dataSnapshot.getChildren()) {
-                    ChatModel chatModel = item.getValue(ChatModel.class);
-                    // 채팅방이 기존에 있을 경우
-                    if (chatModel.users.containsKey(destinationUid) && chatModel.users.size() == 2) {
-                        chatRoomUid = item.getKey();
-                        input_button.setEnabled(true);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
-                        recyclerView.setAdapter(new RecyclerViewAdapter());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    public void testMethod() {
-        FirebaseDatabase.getInstance().getReference().child("chatrooms")
-                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
-                    // 현재 내가 들어간 모든 채팅방을 불러온 거니까
-                    // 사이즈랑 상대 uid 고려하면 될 듯도 함
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    ChatModel testChatModel = snapshot.getValue(ChatModel.class);
-
-                    // 기존에 나와 상대방이 포함된 채팅방일 경우
-                    if (testChatModel != null && testChatModel.users.size() == 2
-                            && testChatModel.users.containsKey(uid) && testChatModel.users.containsKey(destinationUid)) {
-                        // 메시지 액티비티로 인텐트 넘기면 될 듯?
-                    }
-
-                    // 채팅방이 비었을 경우
-                    else {
-                        ChatModel newRoom = new ChatModel();
-                        newRoom.users.put(uid, true);
-                        newRoom.users.put(destinationUid, true);
-                        FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(newRoom)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        //
-                                    }
-                                });
-                        return;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    @Override
-    public void onBackPressed() {
-        // super.onBackPressed();
-        // 메시지가 없을 경우 뒤로가기 버튼을 눌러도 틩기지 않습니다.
-        if(valueEventListener != null){
-            databaseReference.removeEventListener(valueEventListener);
-        }
-
-        finish();
-        // overridePendingTransition(R.anim.fast_fromleft, R.anim.fast_toright);
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -117,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
                 // 1:1 대화로 넘기기
                 if (getIntent().getStringExtra("caseNumber") != null &&
                         user != null && getIntent().getStringExtra("caseNumber").equals("0")) {
+                    Log.d("Login Act", "1:1 채팅");
                     // 로그인
                     Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                     Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
@@ -129,6 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                 // 1:多 대화로 넘기기
                 else if (getIntent().getStringExtra("caseNumber") != null &&
                         user != null && getIntent().getStringExtra("caseNumber").equals("1")) {
+                    Log.d("Login Act", "1:多 채팅");
                     // 로그인
                     Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                     Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
@@ -141,6 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                 // 게시판으로 넘기기
                 else if (getIntent().getStringExtra("caseNumber") != null &&
                         user != null && getIntent().getStringExtra("caseNumber").equals("2")) {
+                    Log.d("Login Act", "게시판 이동");
                     // 로그인
                     Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                     Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
@@ -150,6 +154,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 else if (user != null) {
+                    Log.d("Login Act", "일반 접속");
                     // 로그인
                     Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                     Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
