@@ -1,7 +1,12 @@
 package com.du.chattingapp.Chat;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -23,6 +29,7 @@ import com.du.chattingapp.Models.NotificationModel;
 import com.du.chattingapp.Models.UserModel;
 import com.du.chattingapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +39,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -52,6 +61,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MessageActivity extends AppCompatActivity {
+    private static final int PICK_IMAGE_FROM_ALBUM = 0;
+
     // 필요한 변수 생성
     public static String destinationUid;
     public static Button input_button;
@@ -60,6 +71,8 @@ public class MessageActivity extends AppCompatActivity {
     public String chatRoomUid;
     public RecyclerView recyclerView;
     public TextView with_who_text;
+    public ImageView openGallery;
+    public ImageView tempImage;
     // 1:1 채팅인지 1:多 채팅인지 확인하는 카운트 변수 입니다.
     int peopleCount = 0;
     // 연도 – 월 – 일 – 시간 – 분
@@ -69,6 +82,11 @@ public class MessageActivity extends AppCompatActivity {
     // Firebase 관련 메소드 불러오기
     private DatabaseReference databaseReference;
     private ValueEventListener valueEventListener;
+
+    private Uri uploadImageUri;
+
+    // 모든
+    private List<ChatModel> chatRooms = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +100,7 @@ public class MessageActivity extends AppCompatActivity {
         destinationUid = getIntent().getStringExtra("destinationUid");
         input_button = (Button) findViewById(R.id.messageactivity_inputbutton);
         input_text = (EditText) findViewById(R.id.messageactivity_inputtext);
+        openGallery = (ImageView) findViewById(R.id.messageactivity_imageview_opengallery);
 
         // 상대방 이름을 불러옵니다.
         with_who_text = (TextView) findViewById(R.id.messageactivity_textview_who);
@@ -91,6 +110,16 @@ public class MessageActivity extends AppCompatActivity {
 
         // recyclerview 불러오기
         recyclerView = (RecyclerView) findViewById(R.id.messageactivity_recyclerview);
+
+        // 사진 전송하기 위한 갤러리 오픈
+        openGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickIntent = new Intent(Intent.ACTION_PICK);
+                pickIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+                startActivityForResult(pickIntent, PICK_IMAGE_FROM_ALBUM);
+            }
+        });
 
         // 전송
         input_button.setOnClickListener(new View.OnClickListener() {
@@ -117,6 +146,7 @@ public class MessageActivity extends AppCompatActivity {
                 } else {
                     // 이미 채팅방이 생성되었을 경우, 그 채팅방의 값을 불러오겠습니다.
                     ChatModel.Comment comment = new ChatModel.Comment();
+                    comment.photoUri = null;
                     comment.uid = uid;
                     comment.message = input_text.getText().toString();
                     comment.timestamp = ServerValue.TIMESTAMP;
@@ -142,9 +172,13 @@ public class MessageActivity extends AppCompatActivity {
         // 현재 유저 네임으로 메시지를 띄울 때 사용하기 위함입니다.
         String userName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
 
-        notificationModel.to = destinationUserModel.pushToken;
-        notificationModel.notification.title = userName;
-        notificationModel.notification.text = input_text.getText().toString();
+        try {
+            notificationModel.to = destinationUserModel.pushToken;
+            // notificationModel.notification.title = userName;
+            // notificationModel.notification.text = input_text.getText().toString();
+        } catch (NullPointerException e) {
+            return;
+        }
 
         // 푸시 메시지 출력에 필요한 변수들입니다.
         notificationModel.data.title = userName;
@@ -159,9 +193,9 @@ public class MessageActivity extends AppCompatActivity {
 
         // 포스트 맨과 같은 헤더 부분입니다.
         Request request = new Request.Builder()
-                .header("Content-Type","application/json")
+                .header("Content-Type", "application/json")
                 // 해당 서버키를 입력합니다.
-                .addHeader("Authorization","key=AIzaSyCDpcPkE61tZtjVRdO3JoJ9AhWdrqEwzFA")
+                .addHeader("Authorization", "key=AIzaSyCDpcPkE61tZtjVRdO3JoJ9AhWdrqEwzFA")
                 // 이것도 맞는지 확인해야 합니다.
                 .url("https://gcm-http.googleapis.com/gcm/send")
                 .post(requestBody)
@@ -221,46 +255,6 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    public void testMethod() {
-        FirebaseDatabase.getInstance().getReference().child("chatrooms")
-                .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
-            // 현재 내가 들어간 모든 채팅방을 불러온 거니까
-            // 사이즈랑 상대 uid 고려하면 될 듯도 함
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    ChatModel testChatModel = snapshot.getValue(ChatModel.class);
-
-                    // 기존에 나와 상대방이 포함된 채팅방일 경우
-                    if (testChatModel != null && testChatModel.users.size() == 2
-                            && testChatModel.users.containsKey(uid) && testChatModel.users.containsKey(destinationUid)) {
-                        // 메시지 액티비티로 인텐트 넘기면 될 듯?
-                    }
-
-                    // 채팅방이 비었을 경우
-                    else {
-                        ChatModel newRoom = new ChatModel();
-                        newRoom.users.put(uid, true);
-                        newRoom.users.put(destinationUid, true);
-                        FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(newRoom)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        //
-                                    }
-                                });
-                        return;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     @Override
     public void onBackPressed() {
         // super.onBackPressed();
@@ -271,6 +265,94 @@ public class MessageActivity extends AppCompatActivity {
 
         finish();
         // overridePendingTransition(R.anim.fast_fromleft, R.anim.fast_toright);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // 넘어온 값이 있을 경우에만
+        if (data != null) {
+            if (requestCode == PICK_IMAGE_FROM_ALBUM && resultCode == RESULT_OK) {
+                // 다이얼로그 뷰 불러오기
+                View alertView = View.inflate(this, R.layout.alertdialog_layout_view, null);
+                tempImage = new ImageView(this);
+                tempImage = alertView.findViewById(R.id.alertdialog_imageview);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+                builder.setView(alertView);
+                tempImage.setImageURI(data.getData());
+
+                // 사진을 전송합시다.
+                builder.setPositiveButton("전송", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 먼저 스토리지에 사진을 저장한 뒤 -> 데이터베이스로 전송합니다.
+                        FirebaseStorage.getInstance().getReference()
+                                .child("message_comments").child(chatRoomUid).putFile(uploadImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                // 프로필 이미지 다운로드 url
+                                String imageUri = task.getResult().getDownloadUrl().toString();
+
+                                // 사진을 전송합니다.
+                                ChatModel chatModel = new ChatModel();
+
+                                // 나 - true, 상대방 - true로 해시맵에 입력됩니다.
+                                chatModel.users.put(uid, true);
+                                chatModel.users.put(destinationUid, true);
+
+                                // 대화방이 없을 경우 생성합니다.
+                                if (chatRoomUid == null) {
+                                    // 데이터 확인하는 도중 중복 실행 방지
+                                    input_button.setEnabled(false);
+                                    // 채팅방 이름을 입력합니다. Push 메소드를 통해 데이터베이스 내 채팅방 이름을 임의적으로 생성되게 합니다.
+                                    FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(chatModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            checkChatRoom();
+                                            input_text.setText("");
+                                        }
+                                    });
+                                } else {
+                                    // 이미 채팅방이 생성되었을 경우, 그 채팅방의 값을 불러오겠습니다.
+                                    ChatModel.Comment comment = new ChatModel.Comment();
+                                    comment.message = null;
+                                    comment.photoUri = imageUri;
+                                    comment.uid = uid;
+                                    comment.timestamp = ServerValue.TIMESTAMP;
+                                    FirebaseDatabase.getInstance().getReference().child("chatrooms").child(chatRoomUid).child("message_comments").push().setValue(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            sendGcm();
+                                            input_text.setText("");
+                                        }
+                                    });
+                                }
+                                checkChatRoom();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MessageActivity.this, "업로드에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                // checkChatRoom();
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                // 이미지 경로 원본 저장
+                uploadImageUri = data.getData();
+            }
+        }
     }
 
     class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -362,36 +444,122 @@ public class MessageActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
             MessageViewHolder messageViewHolder = ((MessageViewHolder) holder);
 
-            with_who_text.setText(destinationUserModel.userName);
+            try {
+                with_who_text.setText(destinationUserModel.userName);
+            } catch (NullPointerException e) {
+                with_who_text.setText("알 수 없음");
+                openGallery.setEnabled(false);
+                input_text.setEnabled(false);
+                input_button.setText("");
+                input_button.setEnabled(false);
+            }
 
             // 채팅이 내 메시지일 경우
             if (comments.get(position).uid.equals(uid)) {
-                messageViewHolder.textView_message.setText(comments.get(position).message);
-                messageViewHolder.textView_message.setBackgroundResource(R.drawable.rightbubble);
-
                 // 내 채팅일 경우 사진 및 이름을 띄우지 않겠습니다.
                 messageViewHolder.linearLayout_destination.setVisibility(View.INVISIBLE);
 
-                messageViewHolder.textView_message.setTextSize(15);
+                // 사진 파일일 경우
+                if (comments.get(position).message == null) {
+                    messageViewHolder.imageview_upload.setVisibility(View.VISIBLE);
+                    messageViewHolder.textView_message.setVisibility(View.GONE);
+                    Glide.with(MessageActivity.this).load(comments.get(position).photoUri).into(messageViewHolder.imageview_upload);
+
+                    messageViewHolder.imageview_upload.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // 사진을 누를 경우 AlertDialog를 띄웁니다.
+                            // 다이얼로그 뷰 불러오기
+                            View alertView = View.inflate(MessageActivity.this, R.layout.alertdialog_layout_view, null);
+                            tempImage = new ImageView(MessageActivity.this);
+                            tempImage = alertView.findViewById(R.id.alertdialog_imageview);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+                            builder.setView(alertView);
+                            Glide.with(MessageActivity.this).load(comments.get(position).photoUri).into(tempImage);
+
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        }
+                    });
+                }
+
+                // 단순 메시지 채팅일 경우
+                if (comments.get(position).message != null) {
+                    messageViewHolder.imageview_upload.setVisibility(View.GONE);
+                    messageViewHolder.textView_message.setVisibility(View.VISIBLE);
+
+                    // 텍스트 설정
+                    messageViewHolder.textView_message.setText(comments.get(position).message);
+                    messageViewHolder.textView_message.setBackgroundResource(R.drawable.rightbubble);
+                }
+
+                // 내 채팅이니 오른쪽 정렬
                 messageViewHolder.linearLayout_main.setGravity(Gravity.RIGHT);
                 messageViewHolder.textview_timestamp.setGravity(Gravity.RIGHT);
                 setReadCounter(position, messageViewHolder.textView_readCounter_left);
-            } else {
-                Glide.with(holder.itemView.getContext()).load(destinationUserModel.profileImageUri)
-                        // 원형 이미지로 호출
-                        .apply(new RequestOptions().circleCrop())
-                        // 여기에 넣습니다
-                        .into(messageViewHolder.imageview_profile);
+            }
 
-                // 이름에 DB 유저 네임을 불러옵니다.
-                messageViewHolder.textView_name.setText(destinationUserModel.userName);
-                messageViewHolder.linearLayout_destination.setVisibility(View.VISIBLE);
-                messageViewHolder.textView_message.setBackgroundResource(R.drawable.leftbubble);
-                messageViewHolder.textView_message.setText(comments.get(position).message);
-                messageViewHolder.textView_message.setTextSize(15);
+            // 타인 메시지일 경우
+            else {
+                try {
+                    Glide.with(holder.itemView.getContext()).load(destinationUserModel.profileImageUri)
+                            // 원형 이미지로 호출
+                            .apply(new RequestOptions().circleCrop())
+                            // 여기에 넣습니다
+                            .into(messageViewHolder.imageview_profile);
+
+                    // 이름에 DB 유저 네임을 불러옵니다.
+                    messageViewHolder.textView_name.setText(destinationUserModel.userName);
+                    messageViewHolder.linearLayout_destination.setVisibility(View.VISIBLE);
+                } catch (NullPointerException e) {
+                    Glide.with(holder.itemView.getContext()).load(R.drawable.academy_logo)
+                            // 원형 이미지로 호출
+                            .apply(new RequestOptions().circleCrop())
+                            // 여기에 넣습니다
+                            .into(messageViewHolder.imageview_profile);
+                    // 이름에 DB 유저 네임을 불러옵니다.
+                    messageViewHolder.textView_name.setText("알 수 없음");
+                }
+
+                // 사진 파일일 경우
+                if (comments.get(position).message == null) {
+                    messageViewHolder.imageview_upload.setVisibility(View.VISIBLE);
+                    messageViewHolder.textView_message.setVisibility(View.GONE);
+                    Glide.with(MessageActivity.this).load(comments.get(position).photoUri).into(messageViewHolder.imageview_upload);
+
+                    messageViewHolder.imageview_upload.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // 사진을 누를 경우 AlertDialog를 띄웁니다.
+                            // 다이얼로그 뷰 불러오기
+                            View alertView = View.inflate(MessageActivity.this, R.layout.alertdialog_layout_view, null);
+                            tempImage = new ImageView(MessageActivity.this);
+                            tempImage = alertView.findViewById(R.id.alertdialog_imageview);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+                            builder.setView(alertView);
+                            Glide.with(MessageActivity.this).load(comments.get(position).photoUri).into(tempImage);
+
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        }
+                    });
+                }
+
+                // 단순 채팅 메시지일 경우
+                if (comments.get(position).message != null) {
+                    messageViewHolder.imageview_upload.setVisibility(View.GONE);
+                    messageViewHolder.textView_message.setVisibility(View.VISIBLE);
+
+                    // 텍스트 설정
+                    messageViewHolder.textView_message.setText(comments.get(position).message);
+                    messageViewHolder.textView_message.setBackgroundResource(R.drawable.leftbubble);
+                }
+
                 messageViewHolder.linearLayout_main.setGravity(Gravity.LEFT);
                 messageViewHolder.textview_timestamp.setGravity(Gravity.START);
                 setReadCounter(position, messageViewHolder.textView_readCounter_right);
@@ -462,6 +630,7 @@ public class MessageActivity extends AppCompatActivity {
             public TextView textview_timestamp;
             public TextView textView_readCounter_left;
             public TextView textView_readCounter_right;
+            public ImageView imageview_upload;
 
             public MessageViewHolder(View view) {
                 super(view);
@@ -473,6 +642,7 @@ public class MessageActivity extends AppCompatActivity {
                 textview_timestamp = (TextView) view.findViewById(R.id.messageactivity_item_textview_timestamp);
                 textView_readCounter_left = (TextView) view.findViewById(R.id.messageactivity_item_textview_readCounter_left);
                 textView_readCounter_right = (TextView) view.findViewById(R.id.messageactivity_item_textview_readCounter_right);
+                imageview_upload = view.findViewById(R.id.messageactivity_item_imageview_uploadimageview);
             }
         }
     }

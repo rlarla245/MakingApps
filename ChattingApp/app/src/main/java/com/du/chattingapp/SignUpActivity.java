@@ -254,7 +254,6 @@ public class SignUpActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_FROM_ALBUM && resultCode == RESULT_OK) {
             Glide.with(this).load(data.getData())
                     .apply(new RequestOptions().circleCrop()).into(profileImage);
-
             // 이미지 경로 원본 저장
             profileImageUri = data.getData();
         }

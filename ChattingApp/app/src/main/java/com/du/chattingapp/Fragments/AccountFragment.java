@@ -1,6 +1,5 @@
 package com.du.chattingapp.Fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
@@ -25,11 +24,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.du.chattingapp.Models.UserModel;
 import com.du.chattingapp.R;
-import com.du.chattingapp.SignUpActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,16 +43,14 @@ import static android.app.Activity.RESULT_OK;
 
 public class AccountFragment extends Fragment {
     private static final int PICK_IMAGE_FROM_ALBUM = 0;
-    private FirebaseStorage storage;
-
+    public Uri profileImageUri;
+    public String uid;
     // 변수 호출
     ImageView imageView_profileimage;
     TextView userName;
     TextView userPhoneNumber;
     TextView textView_message;
-
-    public Uri profileImageUri;
-    public String uid;
+    private FirebaseStorage storage;
 
     @Nullable
     @Override
@@ -68,10 +62,10 @@ public class AccountFragment extends Fragment {
         storage = FirebaseStorage.getInstance();
 
         // 변수 호출
-        imageView_profileimage = (ImageView)view.findViewById(R.id.accountfragment_imageview_userprofileimage);
-        userName = (TextView)view.findViewById(R.id.accountfragment_username);
-        userPhoneNumber = (TextView)view.findViewById(R.id.accountfragment_textview_userphonenumber);
-        textView_message = (TextView)view.findViewById(R.id.accountfragment_textview_statusmessage);
+        imageView_profileimage = (ImageView) view.findViewById(R.id.accountfragment_imageview_userprofileimage);
+        userName = (TextView) view.findViewById(R.id.accountfragment_username);
+        userPhoneNumber = (TextView) view.findViewById(R.id.accountfragment_textview_userphonenumber);
+        textView_message = (TextView) view.findViewById(R.id.accountfragment_textview_statusmessage);
 
         // 내 uid
         final String myUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -87,7 +81,7 @@ public class AccountFragment extends Fragment {
             }
         });
 
-        final ImageButton imageButton = (ImageButton)view.findViewById(R.id.accountfragment_imagebutton_changestatusmessage);
+        final ImageButton imageButton = (ImageButton) view.findViewById(R.id.accountfragment_imagebutton_changestatusmessage);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,39 +95,41 @@ public class AccountFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserModel userModel = dataSnapshot.getValue(UserModel.class);
 
-                Glide.with(view.getContext()).load(userModel.profileImageUri)
-                        .apply(new RequestOptions().circleCrop()).into(imageView_profileimage);
-                imageView_profileimage.setVisibility(View.VISIBLE);
+                try {
+                    Glide.with(view.getContext()).load(userModel.profileImageUri)
+                            .apply(new RequestOptions().circleCrop()).into(imageView_profileimage);
+                    imageView_profileimage.setVisibility(View.VISIBLE);
 
-                userName.setText(userModel.userName);
-                userName.setVisibility(View.VISIBLE);
-                imageButton.setVisibility(View.VISIBLE);
+                    userName.setText(userModel.userName);
+                    userName.setVisibility(View.VISIBLE);
+                    imageButton.setVisibility(View.VISIBLE);
 
-                // 휴대폰 번호 출력
-                String a = new String(userModel.userPhoneNumber);
-                StringBuffer phoneNumber = new StringBuffer(a);
+                    // 휴대폰 번호 출력
+                    String a = new String(userModel.userPhoneNumber);
+                    StringBuffer phoneNumber = new StringBuffer(a);
 
-                if (phoneNumber.length() == 11) {
-                    phoneNumber.insert(3, '-');
-                    phoneNumber.insert(8, '-');
+                    if (phoneNumber.length() == 11) {
+                        phoneNumber.insert(3, '-');
+                        phoneNumber.insert(8, '-');
 
-                    userPhoneNumber.setText(phoneNumber);
-                    userPhoneNumber.setVisibility(View.VISIBLE);
-                }
+                        userPhoneNumber.setText(phoneNumber);
+                        userPhoneNumber.setVisibility(View.VISIBLE);
+                    } else {
+                        userPhoneNumber.setText(phoneNumber);
+                        userPhoneNumber.setVisibility(View.VISIBLE);
+                    }
 
-                else{
-                    userPhoneNumber.setText(phoneNumber);
-                    userPhoneNumber.setVisibility(View.VISIBLE);
-                }
-
-                if (userModel.status_message == null) {
-                    textView_message.setText("상태메시지를 입력해주세요:)");
-                    textView_message.setVisibility(View.VISIBLE);
-                }
-
-                else {
-                    textView_message.setText(userModel.status_message);
-                    textView_message.setVisibility(View.VISIBLE);
+                    if (userModel.status_message == null) {
+                        textView_message.setText("상태메시지를 입력해주세요:)");
+                        textView_message.setVisibility(View.VISIBLE);
+                    } else {
+                        textView_message.setText(userModel.status_message);
+                        textView_message.setVisibility(View.VISIBLE);
+                    }
+                } catch (NullPointerException e) {
+                    return;
+                } catch (IllegalArgumentException e) {
+                    return;
                 }
             }
 
@@ -157,7 +153,7 @@ public class AccountFragment extends Fragment {
             // 4. 다음과 같이 정상적으로 경로를 받아옵니다.
             Uri file = Uri.fromFile(new File(getPath(data.getData())));
             StorageReference riversRef
-                    = storageRef.child("images/"+file.getLastPathSegment());
+                    = storageRef.child("images/" + file.getLastPathSegment());
             UploadTask uploadTask = riversRef.putFile(file);
 
             uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -251,14 +247,14 @@ public class AccountFragment extends Fragment {
     void showDialog(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View view = layoutInflater.inflate(R.layout.dialog_comment,null);
+        View view = layoutInflater.inflate(R.layout.dialog_comment, null);
 
-        final EditText editText = (EditText)view.findViewById(R.id.comment_dialog_edittext);
+        final EditText editText = (EditText) view.findViewById(R.id.comment_dialog_edittext);
 
         builder.setView(view).setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Map<String,Object> stringObjectMap = new HashMap<>();
+                Map<String, Object> stringObjectMap = new HashMap<>();
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 stringObjectMap.put("status_message", editText.getText().toString());
                 FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(stringObjectMap);

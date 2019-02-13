@@ -9,19 +9,38 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.du.chattingapp.Models.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SplashActivity extends AppCompatActivity {
+    // Test
+    public String mainUid;
 
     private LinearLayout SplashActivityLinearLayout;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
+            mainUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } catch (NullPointerException e) {
+            FirebaseAuth.getInstance().signOut();
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
@@ -80,8 +99,18 @@ public class SplashActivity extends AppCompatActivity {
 
         // 유저 입력을 막을 필요가 없으니 로그인 화면으로 넘겨줘야 합니다.
         else {
+            try {
+                System.out.println("SplashActivity. mainUid 확인: " + mainUid);
+
+            } catch (NullPointerException e) {
+                Toast.makeText(this, "존재하지 않는 계정입니다. 종료합니다.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
             // Intent 필요
-            startActivity(new Intent(this, LoginActivity.class));
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra("mainUid", mainUid);
+            startActivity(intent);
             finish();
         }
     }

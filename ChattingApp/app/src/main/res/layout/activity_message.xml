@@ -12,7 +12,6 @@
         android:layout_height="?android:attr/actionBarSize">
 
         <TextView
-            android:text=""
             android:layout_marginLeft="10dp"
             android:id="@+id/messageactivity_textview_who"
             android:textColor="#ffffff"
@@ -43,7 +42,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:id="@+id/messageactivity_inputbutton"
-            android:background="#000000"
+            android:background="@drawable/rounded_button_style"
             android:text="전송"
             android:theme="@style/ButtonStyle"
             android:textColor="#ffffff"
@@ -51,15 +50,22 @@
             android:layout_width="70dp"
             android:layout_height="wrap_content" />
 
+        <ImageView
+            android:id="@+id/messageactivity_imageview_opengallery"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            android:src="@android:drawable/ic_menu_search" />
+
         <EditText
             android:backgroundTint="#000000"
             android:hint="메시지를 입력해주세요."
             android:layout_toLeftOf="@id/messageactivity_inputbutton"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
+            android:layout_toRightOf="@+id/messageactivity_imageview_opengallery"
             android:id="@+id/messageactivity_inputtext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

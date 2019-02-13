@@ -108,8 +108,8 @@ public class BoardUploadFragment extends Fragment {
         String userName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
 
         notificationModel.to = pushToken;
-        notificationModel.notification.title = titleEditText.getText().toString();
-        notificationModel.notification.text = userName + "님이 새로운 게시글을 업로드했습니다.";
+        // notificationModel.notification.title = titleEditText.getText().toString();
+        // notificationModel.notification.text = userName + "님이 새로운 게시글을 업로드했습니다.";
 
         // 푸시 메시지 출력에 필요한 변수들입니다.
         notificationModel.data.title = titleEditText.getText().toString();
@@ -167,6 +167,8 @@ public class BoardUploadFragment extends Fragment {
             public void onSuccess(Void aVoid) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     Toast.makeText(getContext(), "업로드에 성공했습니다.", Toast.LENGTH_SHORT).show();
+                    titleEditText.setText("");
+                    descriptionEditText.setText("");
                 }
             }
 

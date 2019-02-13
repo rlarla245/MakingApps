@@ -13,6 +13,7 @@
         android:layout_height="65dp">
 
         <ImageView
+            android:src="@drawable/academy_logo"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp"
             android:id="@+id/chatfragment_imageview_profileimage"
@@ -30,8 +31,23 @@
                 android:textColor="#000000"
                 android:singleLine="true"
                 android:id="@+id/chatfragment_textview_destinationuid"
-                android:layout_width="250dp"
+                android:layout_toLeftOf="@+id/chatfragment_textview_notreadcount"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/chatfragment_textview_notreadcount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="5dp"
+                android:layout_toLeftOf="@id/chatfragment_textview_timestamp"
+                android:text="아니이게뭔"
+                android:textColor="@android:color/holo_orange_light"
+                android:textSize="8dp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_below="@+id/chatfragment_textview_destinationuid"

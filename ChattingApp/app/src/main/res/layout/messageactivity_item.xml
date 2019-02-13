@@ -7,6 +7,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:layout_marginTop="8dp"
         android:id="@+id/messageactivity_item_linearlayout"
         android:orientation="vertical"
         android:gravity="center"
@@ -36,17 +37,25 @@
         android:layout_marginBottom="2dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/messageactivity_item_imageview_uploadimageview"
+            android:layout_width="200dp"
+            android:layout_height="200dp"/>
+
         <TextView
-            android:textSize="15dp"
-            android:textColor="#000000"
-            android:text="메시지"
             android:id="@+id/messageactivity_item_textview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="메시지"
+            android:textColor="#000000"
+            android:textSize="15dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"

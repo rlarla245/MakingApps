@@ -109,7 +109,11 @@ public class BoardCommentFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                myName = userModel.userName;
+                try {
+                    myName = userModel.userName;
+                } catch (NullPointerException e) {
+                    myName = "알 수 없음";
+                }
             }
 
             @Override
@@ -194,9 +198,15 @@ public class BoardCommentFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                String url = userModel.profileImageUri;
-                Glide.with(view.getContext()).load(url).apply(new RequestOptions().circleCrop())
-                        .into(writerImageView);
+                try {
+                    String url = userModel.profileImageUri;
+                    Glide.with(view.getContext()).load(url).apply(new RequestOptions().circleCrop())
+                            .into(writerImageView);
+                } catch (NullPointerException e) {
+                    Glide.with(view.getContext()).load(R.drawable.academy_logo
+                    ).apply(new RequestOptions().circleCrop())
+                            .into(writerImageView);
+                }
             }
 
             @Override
@@ -281,9 +291,20 @@ public class BoardCommentFragment extends Fragment {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                            String url = userModel.profileImageUri;
-                            Glide.with(holder.itemView.getContext()).load(url).apply(new RequestOptions().circleCrop())
-                                    .into(((CustomViewHolder) holder).profileImageView);
+                            try {
+                                String url = userModel.profileImageUri;
+                                Glide.with(holder.itemView.getContext()).load(url).apply(new RequestOptions().circleCrop())
+                                        .into(((CustomViewHolder) holder).profileImageView);
+
+                                ((CustomViewHolder) holder).writerNameTextView.setText(commentsDTOs.get(position).userName);
+                                ((CustomViewHolder) holder).commentTextView.setText(commentsDTOs.get(position).comment);
+                            } catch (NullPointerException e) {
+                                Glide.with(holder.itemView.getContext()).load(R.drawable.academy_logo)
+                                        .apply(new RequestOptions().circleCrop())
+                                        .into(((CustomViewHolder) holder).profileImageView);
+                                ((CustomViewHolder) holder).writerNameTextView.setText("탈퇴 유저\n(" + commentsDTOs.get(position).userName + ")");
+                                ((CustomViewHolder) holder).commentTextView.setText(commentsDTOs.get(position).comment);
+                            }
                         }
 
                         @Override
@@ -291,9 +312,6 @@ public class BoardCommentFragment extends Fragment {
                             // 불러오기 실패 or 없을 경우
                         }
                     });
-
-            ((CustomViewHolder) holder).writerNameTextView.setText(commentsDTOs.get(position).userName);
-            ((CustomViewHolder) holder).commentTextView.setText(commentsDTOs.get(position).comment);
 
             // 시간 불러오기
             long unixTime = (long) commentsDTOs.get(position).timestamp;

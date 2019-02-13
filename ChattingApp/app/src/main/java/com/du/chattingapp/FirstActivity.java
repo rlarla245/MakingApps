@@ -28,6 +28,7 @@ import com.du.chattingapp.Fragments.AccountFragment;
 import com.du.chattingapp.Fragments.BoardFragment;
 import com.du.chattingapp.Fragments.ChatFragment;
 import com.du.chattingapp.Fragments.PeoplesFragment;
+import com.du.chattingapp.Models.ChatModel;
 import com.du.chattingapp.Sidebars.SidebarFifthMembers;
 import com.du.chattingapp.Sidebars.SidebarFirstMembers;
 import com.du.chattingapp.Sidebars.SidebarFourthMembers;
@@ -35,14 +36,21 @@ import com.du.chattingapp.Sidebars.SidebarSecondMembers;
 import com.du.chattingapp.Sidebars.SidebarSixthMembers;
 import com.du.chattingapp.Sidebars.SidebarThirdMembers;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class FirstActivity extends AppCompatActivity {
     // Firebase 계정 변수 생성
@@ -52,16 +60,23 @@ public class FirstActivity extends AppCompatActivity {
     public ImageButton emailIcon;
     public TextView emailaddress;
 
+    // 내 uid
+    String uid;
+
     // 이제 MessageActivity로 넘깁시다.
     String destinationUid;
 
     // 이제 GroupMessageActivity로 넘깁시다.
     String destinationRoomUid;
 
+    // 내가 속한 채팅방을 다 불러옵니다.
+    List<ChatModel> chatRooms = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         destinationUid = getIntent().getStringExtra("destinationUid");
         destinationRoomUid = getIntent().getStringExtra("destinationRoomUid");
@@ -77,13 +92,16 @@ public class FirstActivity extends AppCompatActivity {
         // 상태 창 제거
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        readNotReadCount();
+
         // 이메일 아이콘 삽입
         emailIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(FirstActivity.this, "Firebase 연동 중 입니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FirstActivity.this, readNotReadCount() + "개의 읽지 않은 메시지가 있습니다.", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // 툴바 불러오기 + 아이디 변경 필요
         Toolbar toolbar = (Toolbar)findViewById(R.id.nonMemberToolbar);
@@ -238,25 +256,72 @@ public class FirstActivity extends AppCompatActivity {
         });
 
         // 현재 계정이 없을 경우 로그인 액티비티로 넘깁니다.
-        if (FirebaseAuth.getInstance().getCurrentUser().getEmail() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        }
-
-        else {
+        if (FirebaseAuth.getInstance() != null) {
             passPushTokenToServer();
         }
     }
 
+    int readNotReadCount() {
+        // 안 읽은 메시지 갯수
+        int notReadCountNumber = 0;
+
+        // 읽지 않은 메시지 갯수를 세 봅시다.
+        FirebaseDatabase.getInstance().getReference().child("chatrooms").orderByChild("users/" + uid).equalTo(true)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        chatRooms.clear();
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            chatRooms.add(snapshot.getValue(ChatModel.class));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        System.out.println("채팅방 몇 개? : " + chatRooms.size());
+
+        // 채팅 넣기 - 이중 반복문 쓰자
+        for (int i = 0; i < chatRooms.size(); i++) {
+            // 반복문 돌 때마다 초기화 해줘야 합니다.
+            Map<String, ChatModel.Comment> lineMessageMap = new TreeMap<>();
+
+            System.out.println("1 반복문 진입");
+            // 채팅 넣기
+            // 첫 번째 채팅방의 채팅들부터 쭉 불러옵니다.
+            lineMessageMap.putAll(chatRooms.get(i).message_comments);
+
+            for (int commentIndex = 0; commentIndex < lineMessageMap.size(); commentIndex++){
+                if (!lineMessageMap.get((String) lineMessageMap.keySet().toArray()[commentIndex]).readUsers.containsKey(uid)) {
+                    notReadCountNumber ++;
+                }
+            }
+        }
+        return notReadCountNumber;
+    }
+
     // 푸시 토큰을 불러옵니다.
     void passPushTokenToServer() {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String token = FirebaseInstanceId.getInstance().getToken();
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String token = FirebaseInstanceId.getInstance().getToken();
 
-        // Firebase는 현재 해쉬맵에 최적화되어있습니다.
-        Map<String,Object> map = new HashMap<>();
-        map.put("pushToken", token);
+            // Firebase는 현재 해쉬맵에 최적화되어있습니다.
+            Map<String,Object> map = new HashMap<>();
+            map.put("pushToken", token);
 
-        FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(map);
+            FirebaseDatabase.getInstance().getReference().child("users").child(uid).updateChildren(map);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() == null) {
+            finish();
+        }
     }
 }

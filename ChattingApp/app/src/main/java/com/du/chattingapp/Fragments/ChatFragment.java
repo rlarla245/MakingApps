@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -29,7 +30,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,11 +42,17 @@ import java.util.TreeMap;
 public class ChatFragment extends Fragment {
     // Timestamp가 유니코드로 저장되어 있으므로 변환합니다.
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
+    int notReadCounter = 0;
+    public static int totalNotReadCounter = 0;
+    int tempNotReadCounter = 0;
 
+    RecyclerView recyclerView = null;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.chatfragment, container, false);
+
+        /// totalNotReadCounter = 0;
 
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             startActivity(new Intent(view.getContext(), LoginActivity.class));
@@ -54,7 +60,7 @@ public class ChatFragment extends Fragment {
         }
 
         // 리사이클러 뷰 호출, 레이아웃 매니저 설정, 어댑터 설정
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.chatfragment_recyclerview);
+        recyclerView = (RecyclerView) view.findViewById(R.id.chatfragment_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(inflater.getContext()));
         recyclerView.setAdapter(new RecyclerviewAdapter());
 
@@ -63,10 +69,10 @@ public class ChatFragment extends Fragment {
 
     class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private String uid;
-        private List<ChatModel> chatRoomModels = new ArrayList<>();
+        private List<ChatModel> chatRooms = new ArrayList<>();
 
         // 키 리스트 생성
-        private List<String> keys = new ArrayList<>();
+        private List<String> chatRoomsUids = new ArrayList<>();
 
         // 대화하는 사람들의 데이터를 모아봅시다.
         private ArrayList<String> destinationUsers = new ArrayList<>();
@@ -79,17 +85,17 @@ public class ChatFragment extends Fragment {
             FirebaseDatabase.getInstance().getReference().child("chatrooms")
                     // 내가 속한 채팅방에 들어갈 수 있습니다.
                     // 슬래쉬(/)를 통해 하위 데이터 집단에 접근할 수 있습니다. 데이터베이스 참고 바랍니다.
-                    .orderByChild("users/" + uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
+                    .orderByChild("users/" + uid).equalTo(true).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // 재 진입 시 모든 메시지 코멘트가 중복해서 호출됩니다.
-                    chatRoomModels.clear();
+                    chatRooms.clear();
 
                     for (DataSnapshot item : dataSnapshot.getChildren()) {
-                        chatRoomModels.add(item.getValue(ChatModel.class));
+                        chatRooms.add(item.getValue(ChatModel.class));
 
                         // 해당 메시지 채팅룸 uid를 의미합니다.
-                        keys.add(item.getKey());
+                        chatRoomsUids.add(item.getKey());
                     }
                     // 새로고침
                     notifyDataSetChanged();
@@ -120,10 +126,10 @@ public class ChatFragment extends Fragment {
             int countNumber = 0;
 
             // 챗방에 있는 유저들 체크(키 값만 불러옵니다.)
-            for (String user : chatRoomModels.get(position).users.keySet()) {
+            for (String user : chatRooms.get(position).users.keySet()) {
                     // 내가 아닌 사람을 상대방 "uid"로 지정
                     if (!user.equals(uid)) {
-                        if (chatRoomModels.get(position).users.size() > 2) {
+                        if (chatRooms.get(position).users.size() > 2) {
                             if (countNumber < 1) {
                                 countNumber++;
                                 destinationUid = user;
@@ -141,7 +147,7 @@ public class ChatFragment extends Fragment {
 
             // 현재 1:1 채팅기능에 중점을 뒀었기 때문에 여기서 채팅방의 '마지막 유저'의 이미지 및 이름만 불러오게 되므로
             // 이를 수정해봅시다.
-            if (chatRoomModels.get(position).users.size() == 2) {
+            if (chatRooms.get(position).users.size() == 2) {
                 // 데이터베이스에서 그 유저가 누구인지 불러옵시다.
                 FirebaseDatabase.getInstance().getReference().child("users").child(destinationUid)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -149,14 +155,26 @@ public class ChatFragment extends Fragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 UserModel destiUserModel = dataSnapshot.getValue(UserModel.class);
 
-                                // 프로필 이미지 불러옵니다.
-                                Glide.with(customViewHolder.itemView.getContext())
-                                        .load(destiUserModel.profileImageUri)
-                                        .apply(new RequestOptions().circleCrop())
-                                        .into(customViewHolder.profileimage);
+                                try {
+                                    // 프로필 이미지 불러옵니다.
+                                    Glide.with(customViewHolder.itemView.getContext())
+                                            .load(destiUserModel.profileImageUri)
+                                            .apply(new RequestOptions().circleCrop())
+                                            .into(customViewHolder.profileimage);
 
-                                // 상대방 이름을 지정합니다.
-                                customViewHolder.dest_name.setText(destiUserModel.userName);
+                                    // 상대방 이름을 지정합니다.
+                                    customViewHolder.dest_name.setText(destiUserModel.userName);
+
+                                } catch (NullPointerException e) {
+                                    // 프로필 이미지 불러옵니다.
+                                    Glide.with(customViewHolder.itemView.getContext())
+                                            .load(R.color.cardview_dark_background)
+                                            .apply(new RequestOptions().circleCrop())
+                                            .into(customViewHolder.profileimage);
+
+                                    // 상대방 이름을 지정합니다.
+                                    customViewHolder.dest_name.setText("알 수 없음");
+                                }
                             }
 
                             @Override
@@ -165,16 +183,17 @@ public class ChatFragment extends Fragment {
                             }
                         });
             }
+
             // 단체 채팅방의 경우 어떻게 될지 봅시다.
             else {
                 // 프로필 이미지 불러옵니다.
                 Glide.with(customViewHolder.itemView.getContext())
-                        .load(R.drawable.ssma_push_icon)
-                        .apply(new RequestOptions().circleCrop())
+                        .load(R.drawable.academy_logo)
+                        .apply(new RequestOptions().centerInside().circleCrop())
                         .into(customViewHolder.profileimage);
 
                 // 반복문 돌리고 데이터베이스 접속합니다.
-                for (final String uids : chatRoomModels.get(position).users.keySet()) {
+                for (final String uids : chatRooms.get(position).users.keySet()) {
                     if (!uids.equals(uid)) {
                         FirebaseDatabase.getInstance().getReference().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -188,10 +207,16 @@ public class ChatFragment extends Fragment {
                                     }
                                 }
 
-                                // CharSequence로 변수 생성한 뒤 기존 문자열을 쪼개서 적용합니다.
-                                CharSequence tests = customViewHolder.temporary_name.getText();
-                                CharSequence test2 = tests.subSequence(0, tests.length() - 2);
-                                customViewHolder.dest_name.setText(test2);
+                                try {
+                                    // CharSequence로 변수 생성한 뒤 기존 문자열을 쪼개서 적용합니다.
+                                    CharSequence tests = customViewHolder.temporary_name.getText();
+                                    CharSequence test2 = tests.subSequence(0, tests.length() - 2);
+                                    customViewHolder.dest_name.setText(test2);
+                                }
+
+                                catch (StringIndexOutOfBoundsException e) {
+                                    customViewHolder.dest_name.setText("알 수 없음");
+                                }
                             }
 
                             @Override
@@ -201,15 +226,49 @@ public class ChatFragment extends Fragment {
                         });
                     }
                 }
+                customViewHolder.temporary_name.setText("");
             }
+
 
             // 메시지를 내림 차순으로 정렬 후 마지막 메시지의 키 값을 가져오게 해야 합니다.
             // 아래 코드를 통해 메시지를 자동으로 내림차순으로 불러옵니다.
             // 처음 써보는 기능(TreeMap<>()) - Collections 클래스의 메소드입니다.
             Map<String, ChatModel.Comment> messageMap = new TreeMap<>(Collections.reverseOrder());
+            Map<String, ChatModel.Comment> lineMessageMap = new TreeMap<>();
 
             // 채팅 내용을 넣어줍니다.
-            messageMap.putAll(chatRoomModels.get(position).message_comments);
+            messageMap.putAll(chatRooms.get(position).message_comments);
+            lineMessageMap.putAll(chatRooms.get(position).message_comments);
+
+            int indexOfMessage_comments = 0;
+
+            while (indexOfMessage_comments < lineMessageMap.size()) {
+                if (!lineMessageMap.get((String) lineMessageMap.keySet().toArray()[indexOfMessage_comments]).readUsers.containsKey(uid)) {
+                    notReadCounter++;
+                }
+                indexOfMessage_comments ++;
+            }
+
+            // System.out.println("읽지 않은 메시지의 개수: " + notReadCounter);
+            ((CustomViewHolder)holder).notReadTextView.setText(String.valueOf(notReadCounter));
+
+            if (!((CustomViewHolder)holder).notReadTextView.getText().toString().equals("0")) {
+                ((CustomViewHolder)holder).notReadTextView.setVisibility(View.VISIBLE);
+            }
+
+            if (((CustomViewHolder)holder).notReadTextView.getText().toString().equals("0")) {
+                ((CustomViewHolder)holder).notReadTextView.setVisibility(View.INVISIBLE);
+            }
+
+            if (position < chatRooms.size() - 1) {
+                tempNotReadCounter += notReadCounter;
+            }
+
+            if (position == chatRooms.size() - 1) {
+                totalNotReadCounter += tempNotReadCounter + notReadCounter;
+                tempNotReadCounter = 0;
+            }
+            notReadCounter = 0;
 
             // 메시지가 하나라도 있을 경우에만 설정합니다.
             if (messageMap.keySet().toArray().length > 0) {
@@ -217,11 +276,11 @@ public class ChatFragment extends Fragment {
                 String lastMessageKey = (String) messageMap.keySet().toArray()[0];
 
                 // 채팅방에 마지막 메시지를 찍어줘야죠?
-                customViewHolder.last_meesage.setText(chatRoomModels.get(position).message_comments.get(lastMessageKey).message);
+                customViewHolder.last_meesage.setText(chatRooms.get(position).message_comments.get(lastMessageKey).message);
 
                 // 타임스탬프 찍기
                 simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
-                long unixTime = (long) chatRoomModels.get(position).message_comments.get(lastMessageKey).timestamp;
+                long unixTime = (long) chatRooms.get(position).message_comments.get(lastMessageKey).timestamp;
                 Date date = new Date(unixTime);
                 customViewHolder.timestamp.setText(simpleDateFormat.format(date));
             }
@@ -234,12 +293,12 @@ public class ChatFragment extends Fragment {
 
                     // 단체 채팅방으로 들어갑니다.
                     // 방 uid만 입력한다는 것은 단체 채팅방 액티비티에서 해당 uid 정보만 받겠다는 뜻입니다.
-                    if (chatRoomModels.get(position).users.size() > 2) {
+                    if (chatRooms.get(position).users.size() > 2) {
                         intent = new Intent(v.getContext(), GroupMessageActivity.class);
 
                         // 방의 key 값(uid)을 넘겨주는 의미입니다.
                         // 상단의 방 uid 불러오는 게 가장 까다로운 코드로 보입니다.
-                        intent.putExtra("destinationRoom", keys.get(position));
+                        intent.putExtra("destinationRoom", chatRoomsUids.get(position));
                     }
 
                     // 1:1 채팅방으로 들어갑니다.
@@ -266,7 +325,7 @@ public class ChatFragment extends Fragment {
         @Override
         public int getItemCount() {
             // 결국 '내'가 들어간 모든 채팅방의 사이즈만큼만 불러옵니다.
-            return chatRoomModels.size();
+            return chatRooms.size();
         }
 
         private class CustomViewHolder extends RecyclerView.ViewHolder {
@@ -275,6 +334,7 @@ public class ChatFragment extends Fragment {
             public TextView temporary_name;
             public TextView last_meesage;
             public TextView timestamp;
+            public TextView notReadTextView;
             public LinearLayout itemLayout;
 
             public CustomViewHolder(final View view) {
@@ -285,6 +345,7 @@ public class ChatFragment extends Fragment {
                 timestamp = (TextView) view.findViewById(R.id.chatfragment_textview_timestamp);
                 itemLayout = (LinearLayout) view.findViewById(R.id.chatfragment_linearlayout);
                 temporary_name = (TextView)view.findViewById(R.id.chatfragment_textview_temporarynames);
+                notReadTextView = (TextView)view.findViewById(R.id.chatfragment_textview_notreadcount);
             }
         }
     }

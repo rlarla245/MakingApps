@@ -31,6 +31,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PeoplesFragment extends Fragment {
     // 유저들을 담는 리스트입니다.
@@ -47,7 +49,6 @@ public class PeoplesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.peoples_fragment, container, false);
-
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         // 리사이클러 뷰 호출, 레이아웃 매니저, 어댑터 설정
@@ -71,6 +72,7 @@ public class PeoplesFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 chatModels.clear();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     if (snapshot.getValue(ChatModel.class).users.size() == 2) {
                         ChatModel serverChatmodel = snapshot.getValue(ChatModel.class);
@@ -85,6 +87,7 @@ public class PeoplesFragment extends Fragment {
             }
         });
         /*-------------------------------------------------------------------------------------------------------*/
+
         return view;
     }
 

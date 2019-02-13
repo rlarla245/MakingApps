@@ -95,8 +95,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
+                    // 각도(0 - 360도)
                     final int[] rotationNumber = {0};
 
+                    // 버튼을 누르면 수동으로 10도 씩 그림이 회전합니다.
                     rotateButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -104,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
                             androidImageView.setRotation(rotationNumber[0]);
                         }
                     });
+
                 } else {
                     androidLayout.setVisibility(View.INVISIBLE);
                     buttonsLayout.setVisibility(View.INVISIBLE);

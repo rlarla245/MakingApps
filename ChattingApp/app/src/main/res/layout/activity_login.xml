@@ -6,6 +6,7 @@
     android:background="#000000"
     android:gravity="center"
     android:orientation="vertical"
+    android:id="@+id/loginactivity_mainlinearlayout"
     tools:context=".LoginActivity">
 
     <ImageView
@@ -50,7 +51,7 @@
         android:id="@+id/loginactivity_button_login"
         android:text="회원 로그인"
         android:layout_marginTop="10dp"
-        android:background="#ffffff"
+        android:background="@drawable/rounded_button_style_white"
         android:theme="@style/ButtonStyle"
         android:layout_width="240dp"
         android:layout_height="40dp" />
@@ -60,7 +61,7 @@
         android:id="@+id/loginactivity_button_signup"
         android:text="회원가입"
         android:layout_marginTop="5dp"
-        android:background="#ffffff"
+        android:background="@drawable/rounded_button_style_white"
         android:theme="@style/ButtonStyle"
         android:layout_width="240dp"
         android:layout_height="40dp" />

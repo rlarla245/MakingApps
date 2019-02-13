@@ -1,5 +1,7 @@
 package com.du.chattingapp.Models;
 
+import android.net.Uri;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ public class ChatModel {
     public Map<String, Comment> message_comments = new HashMap<>();
 
     public static class Comment {
+        public String photoUri;
         public String uid;
         public String message;
         public Object timestamp;
