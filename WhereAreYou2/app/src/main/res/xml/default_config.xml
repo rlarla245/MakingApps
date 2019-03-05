@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><!-- START xml_defaults -->
+<defaultsMap>
+    <entry>
+        <key>splash_background</key>
+        <!--#000000 ~ #ffffff-->
+        <value>#69bad6</value>
+    </entry>
+    <entry>
+        <key>splash_message_caps</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>splash_message</key>
+        <value>Where Are You입니다.</value>
+    </entry>
+</defaultsMap><!-- END xml_defaults -->

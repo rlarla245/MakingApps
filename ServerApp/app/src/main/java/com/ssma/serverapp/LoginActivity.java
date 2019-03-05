@@ -18,7 +18,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.ssma.serverapp.NonMembers.NonMemberFirstActivity;
 
 public class LoginActivity extends AppCompatActivity {
-
     public static EditText idTextView;
     EditText passwordTextview;
     Button loginButton;
@@ -39,10 +38,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.layout_login_activity);
 
         // 버튼 및 텍스트 뷰 불러오기
-        loginButton = (Button)findViewById(R.id.loginactivity_button_login);
-        signUpButton = (Button)findViewById(R.id.loginactivity_button_signup);
+        loginButton = (Button) findViewById(R.id.loginactivity_button_login);
+        signUpButton = (Button) findViewById(R.id.loginactivity_button_signup);
         idTextView = (EditText) findViewById(R.id.loginactivity_edittext_email);
-        passwordTextview = (EditText) findViewById(R.id.loginactivity_edittext_password);
+        passwordTextview = findViewById(R.id.loginactivity_edittext_password);
 
         // 파이어베이스 계정 불러오기
         firebaseAuth = FirebaseAuth.getInstance();
@@ -112,7 +111,6 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                     // 로그아웃
                     Toast.makeText(LoginActivity.this, "로그아웃 됩니다.", Toast.LENGTH_SHORT).show();
-                    finish();
                 }
             }
         };
@@ -154,8 +152,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (firebaseAuth != null) {
-            firebaseAuth.removeAuthStateListener(authStateListener);
-        }
+        firebaseAuth.removeAuthStateListener(authStateListener);
     }
 }

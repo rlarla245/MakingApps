@@ -29,7 +29,6 @@
 
         <LinearLayout
             android:id="@+id/accountfragment_linearlayout"
-            android:layout_toRightOf="@+id/accountfragment_imageview_userprofileimage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

@@ -32,17 +32,16 @@ public class SplashActivity extends AppCompatActivity {
     private LinearLayout SplashActivityLinearLayout;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
         try {
             mainUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } catch (NullPointerException e) {
             FirebaseAuth.getInstance().signOut();
         }
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
 
         // 상태 창 제거
         // 잘 안하긴 함

@@ -57,16 +57,6 @@ public class NonMemberGoogleMap extends AppCompatActivity implements OnMapReadyC
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        // 이메일 버튼 누를 시 Toast 기능 활용
-        /*
-        toolbar.findViewById(R.id.firstActivityrToolbarEmailIcon).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(NonMemberGoogleMap.this, "로그인이 필요합니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
-        */
-
         // 툴바, 사이드 바 활용 위한 drawerlayout 설정
         final DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.nonmember_googlemap_drawerlayout);
 
