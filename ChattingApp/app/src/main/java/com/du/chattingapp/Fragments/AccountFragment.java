@@ -108,6 +108,7 @@ public class AccountFragment extends Fragment {
                     String a = new String(userModel.userPhoneNumber);
                     StringBuffer phoneNumber = new StringBuffer(a);
 
+
                     if (phoneNumber.length() == 11) {
                         phoneNumber.insert(3, '-');
                         phoneNumber.insert(8, '-');

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".OrderByChildLimit">
+
+    <TextView
+        android:text="OrderByChild &amp; Limit"
+        android:textColor="#000000"
+        android:textSize="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:entries="@array/orderby"
+            android:layout_weight="1"
+            android:id="@+id/orderbychile_spinner_direction"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <Spinner
+            android:entries="@array/age"
+            android:layout_weight="1"
+            android:id="@+id/orderbychile_spinner_startat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <Spinner
+            android:entries="@array/age"
+            android:layout_weight="1"
+            android:id="@+id/orderbychile_spinner_endat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <Spinner
+            android:entries="@array/limit"
+            android:layout_weight="1"
+            android:id="@+id/orderbychile_spinner_limit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/orderbychile_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1080944341005",
+    "firebase_url": "https://firestore-test-eff2a.firebaseio.com",
+    "project_id": "firestore-test-eff2a",
+    "storage_bucket": "firestore-test-eff2a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1080944341005:android:613ea75fae66ad97",
+        "android_client_info": {
+          "package_name": "com.updatetest.firestoretest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1080944341005-b4b2di6ol9j4a1tjot35990m0geh95o2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9SBYIP2q-0AocTPXLWTEm6at6EqsYTeA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

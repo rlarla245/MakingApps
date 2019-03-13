@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="major">
+        <item>Hotel Management</item>
+        <item>Hotel Management &amp; English Literature</item>
+        <item>Math</item>
+        <item>HT&amp;EL</item>
+    </string-array>
+
+    <string-array name="age">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
+
+    <!--오름/내림차순-->
+    <string-array name="orderby">
+        <item>ASC</item>
+        <item>DESC</item>
+    </string-array>
+
+    <string-array name="limit">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+
+
+</resources>
