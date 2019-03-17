@@ -1,5 +1,6 @@
 package com.updatetest.whereareyou;
 
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.UserHandle;
@@ -117,17 +118,21 @@ public class MainActivity extends AppCompatActivity {
                                         counterpartUid = userModel.uid;
                                         System.out.println("확인. 휴대폰 번호가 일치합니다.");
 
-
-
-
                                         // 다음 로그인 시 다이얼로그 창이 뜨지 않게 수정합니다.
                                         Map<String, Object> updateCaseNumber = new HashMap<>();
                                         updateCaseNumber.put("caseNumber", 1);
                                         FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                                 .updateChildren(updateCaseNumber);
 
+                                        // 번들 값에 상대방 uid를 담아 넘겨줍니다.
+                                        Bundle bundle_toMapFragment = new Bundle();
+                                        bundle_toMapFragment.putString("counterPartUid", counterpartUid);
+
+                                        MapFragment toMapFragment = new MapFragment();
+                                        toMapFragment.setArguments(bundle_toMapFragment);
+
                                         // 위치를 보여주는 프레그먼트로 넘깁니다.
-                                        getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment, new MapFragment())
+                                        getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment, toMapFragment)
                                                 .commit();
 
                                         // Toast.makeText(MapFragment.this, "상대방도 나의 휴대폰 번호를 입력하면\n위치가 보여집니다 :)", Toast.LENGTH_SHORT).show();

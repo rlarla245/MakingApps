@@ -205,6 +205,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             // 회원가입 시 자신의 아이디를 담기 위한 코드입니다.
                             // 채팅방 진입 시 상대방 이름 불러올 때 활용됩니다.
+                            // getDisplayName() 같은 메소드 활용 시
                             UserProfileChangeRequest userProfileChangeRequest
                                     = new UserProfileChangeRequest.Builder().setDisplayName(dialog_editTextEmail.getText().toString()).build();
                             task.getResult().getUser().updateProfile(userProfileChangeRequest);
