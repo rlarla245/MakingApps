@@ -58,36 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         // 계정 인스턴스 호출합니다.
         firebaseAuth = FirebaseAuth.getInstance();
 
-        // 로그인 버튼 활성화
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 아이디 칸이 공백이고, 패스워드 칸이 공백일 경우 return 합니다.
-                if (editTextEmail.getText().toString().trim().equals("")
-                        && editTextPassword.getText().toString().trim().equals("")) {
-                    Toast.makeText(LoginActivity.this, "계정 입력이 필요합니다.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // 패스워드를 입력하지 않았을 경우
-                if (!editTextEmail.getText().toString().trim().equals("") && editTextPassword.getText().toString().trim().equals("")) {
-                    Toast.makeText(LoginActivity.this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // 아이디를 입력하지 않았을 경우
-                if (editTextEmail.getText().toString().trim().equals("") && !editTextPassword.getText().toString().trim().equals("")) {
-                    Toast.makeText(LoginActivity.this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // 실제로 로그인을 진행합니다. -> "여부"만 불러옵니다.
-                else {
-                    loginEvent();
-                }
-            }
-        });
-
+        // 회원가입 텍스트입니다.
         textViewToSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,6 +113,36 @@ public class LoginActivity extends AppCompatActivity {
 
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
+            }
+        });
+
+        // 로그인 버튼 활성화
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 아이디 칸이 공백이고, 패스워드 칸이 공백일 경우 return 합니다.
+                if (editTextEmail.getText().toString().trim().equals("")
+                        && editTextPassword.getText().toString().trim().equals("")) {
+                    Toast.makeText(LoginActivity.this, "계정 입력이 필요합니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 패스워드를 입력하지 않았을 경우
+                if (!editTextEmail.getText().toString().trim().equals("") && editTextPassword.getText().toString().trim().equals("")) {
+                    Toast.makeText(LoginActivity.this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 아이디를 입력하지 않았을 경우
+                if (editTextEmail.getText().toString().trim().equals("") && !editTextPassword.getText().toString().trim().equals("")) {
+                    Toast.makeText(LoginActivity.this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // 실제로 로그인을 진행합니다. -> "여부"만 불러옵니다.
+                else {
+                    loginEvent();
+                }
             }
         });
 
@@ -214,6 +215,7 @@ public class LoginActivity extends AppCompatActivity {
                             userModel.userEmail = dialog_editTextEmail.getText().toString().trim();
                             userModel.userPhoneNumber = dialog_editTextPhoneNumber.getText().toString().trim();
                             userModel.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
                             // 매칭된 유저가 있는지 확인하는 int 변수입니다.
                             userModel.caseNumber = 0;
 
@@ -238,6 +240,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // 앱 종료 혹은 가려질 때
+    // Resume() 되면 중복 로그인이 되어 버림
     @Override
     protected void onPause() {
         super.onPause();

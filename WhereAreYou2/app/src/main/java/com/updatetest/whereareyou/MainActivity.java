@@ -87,8 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
                 // 테스트
                 if (caseNumber == 1) {
+                    Fragment toMapFragment = new MapFragment();
+
                     // 위치를 보여주는 프레그먼트로 넘깁니다.
-                    getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment, new MapFragment())
+                    getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment,toMapFragment)
                             .commit();
                 }
 
@@ -121,15 +123,11 @@ public class MainActivity extends AppCompatActivity {
                                         // 다음 로그인 시 다이얼로그 창이 뜨지 않게 수정합니다.
                                         Map<String, Object> updateCaseNumber = new HashMap<>();
                                         updateCaseNumber.put("caseNumber", 1);
+                                        updateCaseNumber.put("counterPartUid", counterpartUid);
                                         FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                                 .updateChildren(updateCaseNumber);
 
-                                        // 번들 값에 상대방 uid를 담아 넘겨줍니다.
-                                        Bundle bundle_toMapFragment = new Bundle();
-                                        bundle_toMapFragment.putString("counterPartUid", counterpartUid);
-
-                                        MapFragment toMapFragment = new MapFragment();
-                                        toMapFragment.setArguments(bundle_toMapFragment);
+                                        Fragment toMapFragment = new MapFragment();
 
                                         // 위치를 보여주는 프레그먼트로 넘깁니다.
                                         getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment, toMapFragment)
@@ -202,6 +200,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 상태창 제거
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 }
