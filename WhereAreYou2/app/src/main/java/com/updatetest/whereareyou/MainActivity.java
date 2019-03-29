@@ -3,28 +3,22 @@ package com.updatetest.whereareyou;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.UserHandle;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.updatetest.whereareyou.Fragment.MapFragment;
+import com.updatetest.whereareyou.Fragment.CheckRoomMapFragment;
 import com.updatetest.whereareyou.Models.UserModel;
 
 import java.util.ArrayList;
@@ -87,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // 테스트
                 if (caseNumber == 1) {
-                    Fragment toMapFragment = new MapFragment();
+                    Fragment toMapFragment = new CheckRoomMapFragment();
 
                     // 위치를 보여주는 프레그먼트로 넘깁니다.
                     getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment,toMapFragment)
@@ -113,6 +107,24 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             // db 값 불러와야 됩니다.
                             for (UserModel userModel : userModels) {
+                                String myPhoneNumber = null;
+
+                                // 내 휴대폰 번호 불러오기
+                                if (userModel.uid.equals(myUid)) {
+                                    myPhoneNumber = userModel.userPhoneNumber;
+                                }
+
+                                // 내 휴대폰 번호를 입력한 경우
+                                if (editText_UserPhoneNumber.getText().toString().equals(myPhoneNumber)) {
+                                    Toast.makeText(MainActivity.this, "본인의 휴대폰 번호를 입력할 수 없습니다.", Toast.LENGTH_SHORT).show();
+
+                                    // 임시방편으로 계속 다시 띄웁니다.
+                                    finish();
+                                    startActivity(new Intent(MainActivity.this, MainActivity.class));
+
+                                    return;
+                                }
+
                                 // 휴대폰 번호가 일치할 경우
                                 if (editText_UserPhoneNumber.getText().toString().trim().equals(userModel.userPhoneNumber)) {
                                     try {
@@ -124,16 +136,18 @@ public class MainActivity extends AppCompatActivity {
                                         Map<String, Object> updateCaseNumber = new HashMap<>();
                                         updateCaseNumber.put("caseNumber", 1);
                                         updateCaseNumber.put("counterPartUid", counterpartUid);
+
+                                        // DB 값 수정
                                         FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                                 .updateChildren(updateCaseNumber);
 
-                                        Fragment toMapFragment = new MapFragment();
+                                        Fragment toMapFragment = new CheckRoomMapFragment();
 
                                         // 위치를 보여주는 프레그먼트로 넘깁니다.
                                         getFragmentManager().beginTransaction().replace(R.id.mainactivity_fragment, toMapFragment)
                                                 .commit();
 
-                                        // Toast.makeText(MapFragment.this, "상대방도 나의 휴대폰 번호를 입력하면\n위치가 보여집니다 :)", Toast.LENGTH_SHORT).show();
+                                        // Toast.makeText(CheckRoomMapFragment.this, "상대방도 나의 휴대폰 번호를 입력하면\n위치가 보여집니다 :)", Toast.LENGTH_SHORT).show();
                                     } catch (NullPointerException e) {
                                         Toast.makeText(MainActivity.this, "상대방 uid Null 에러. 관리자에게 문의바랍니다.", Toast.LENGTH_SHORT).show();
                                         finish();
@@ -153,10 +167,17 @@ public class MainActivity extends AppCompatActivity {
                                 finish();
                             }
                         }
-                    }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("로그아웃", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
+                            // dialog.cancel();
+
+                            Toast.makeText(MainActivity.this, "로그아웃됩니다. 감사합니다 :)", Toast.LENGTH_SHORT).show();
+
+                            // 로그인 화면 이동
+                            FirebaseAuth.getInstance().signOut();
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                            finish();
                         }
                     });
 
@@ -191,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseAuth.getInstance().signOut();
                             Toast.makeText(MainActivity.this, "로그아웃 됩니다.", Toast.LENGTH_SHORT).show();
                             finish();
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         }
                         return true;
                     }

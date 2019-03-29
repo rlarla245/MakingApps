@@ -1,9 +1,13 @@
 package com.updatetest.whereareyou;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,8 +23,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.updatetest.whereareyou.Models.UserModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     // 각 위젯 변수들을 불러옵니다.
@@ -40,10 +50,16 @@ public class LoginActivity extends AppCompatActivity {
     // 로그인 listener 호출합니다.
     FirebaseAuth.AuthStateListener authStateListener;
 
+    // 겹치는 휴대폰 번호가 없도록 조정합니다.
+    List<UserModel> userModelToCheckPhoneNumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // 휴대폰 번호 중복 리스트 호출
+        userModelToCheckPhoneNumber = new ArrayList<>();
 
         // EditText 변수들을 호출합니다.
         editTextEmail = findViewById(R.id.loginactivity_edittext_email);
@@ -62,6 +78,10 @@ public class LoginActivity extends AppCompatActivity {
         textViewToSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 회원가입 이전에 권한을 받아옵시다.
+                ActivityCompat.requestPermissions
+                        (LoginActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
                 // 회원가입을 위해 dialog창을 띄웁니다.
                 View alertView = View.inflate(LoginActivity.this, R.layout.signup_dialog_view, null);
 
@@ -81,24 +101,34 @@ public class LoginActivity extends AppCompatActivity {
                 builder.setPositiveButton("회원가입", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // 실제로 회원가입을 진행하는 부분입니다.
-                                // 각각의 입력창 중 하나라도 공백일 경우 해당 메시지를 출력합니다.
-                                if (dialog_editTextEmail.getText().toString().trim().equals("")
-                                        || dialog_editTextPhoneNumber.getText().toString().trim().equals("")
-                                        || dialog_editTextPassword.getText().toString().trim().equals("")) {
-                                    Toast.makeText(LoginActivity.this, "입력을 완료해주세요.", Toast.LENGTH_SHORT).show();
+                                // 권한 다 받았어?
+                                if (ContextCompat.checkSelfPermission
+                                        (LoginActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                        == PackageManager.PERMISSION_GRANTED
+                                        && ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                        == PackageManager.PERMISSION_GRANTED) {
 
-                                    return;
-                                }
+                                    // 실제로 회원가입을 진행하는 부분입니다.
+                                    // 각각의 입력창 중 하나라도 공백일 경우 해당 메시지를 출력합니다.
+                                    if (dialog_editTextEmail.getText().toString().trim().equals("")
+                                            || dialog_editTextPhoneNumber.getText().toString().trim().equals("")
+                                            || dialog_editTextPassword.getText().toString().trim().equals("")) {
+                                        Toast.makeText(LoginActivity.this, "입력을 완료해주세요.", Toast.LENGTH_SHORT).show();
 
-                                // 패스워드의 길이가 6자리가 되지 않을 경우
-                                if (dialog_editTextPassword.getText().toString().length() < 6) {
-                                    Toast.makeText(LoginActivity.this, "비밀번호는 6자리 이상입니다.", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
 
-                                    return;
+                                    // 패스워드의 길이가 6자리가 되지 않을 경우
+                                    if (dialog_editTextPassword.getText().toString().length() < 6) {
+                                        Toast.makeText(LoginActivity.this, "비밀번호는 6자리 이상입니다.", Toast.LENGTH_SHORT).show();
+
+                                        return;
+                                    } else {
+                                        createUsers();
+                                        dialog.cancel();
+                                    }
                                 } else {
-                                    createUsers();
-                                    dialog.cancel();
+                                    Toast.makeText(LoginActivity.this, "권한 동의가 필요합니다.", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
@@ -180,54 +210,88 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     void createUsers() {
-        // 실제로 계정을 생성하는 메소드입니다.
-        FirebaseAuth.getInstance()
-                .createUserWithEmailAndPassword(dialog_editTextEmail.getText().toString().trim(), dialog_editTextPassword.getText().toString().trim())
-                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+        // 휴대폰 번호 중복을 막기 위한 DB 작업
+        FirebaseDatabase.getInstance().getReference().child("users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        // 로그인 실패
-                        if (!task.isSuccessful()) {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        userModelToCheckPhoneNumber.clear();
+
+                        // 반복문 호출
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             try {
-                                // 실패할 경우 예외 처리를 실시합니다... 라는 뜻으로 보입니다?
-                                throw task.getException();
+                                // 유저 모델 호출
+                                UserModel userModelToCheckPhoneNumber = snapshot.getValue(UserModel.class);
 
-                            } catch (FirebaseAuthUserCollisionException e) {
-                                Toast.makeText(LoginActivity.this, "이미 존재하는 이메일입니다.", Toast.LENGTH_SHORT).show();
+                                if (userModelToCheckPhoneNumber != null && userModelToCheckPhoneNumber.userPhoneNumber
+                                        .equals(dialog_editTextPhoneNumber.getText().toString().trim())) {
+                                    Toast.makeText(LoginActivity.this, "휴대폰 번호가 중복됩니다. 다시 입력해주세요 :)", Toast.LENGTH_SHORT).show();
 
-                            } catch (Exception e2) {
-                                Toast.makeText(LoginActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            } catch (NullPointerException e) {
+                                System.out.println("로그인 데이터가 없습니다.");
+                                Toast.makeText(LoginActivity.this, "로그인 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(LoginActivity.this, "데이터베이스 입력 중 입니다.", Toast.LENGTH_SHORT).show();
-
-                            // 회원가입한 유저의 uid를 바로 불러옵니다.
-                            final String uid = task.getResult().getUser().getUid();
-
-                            // 회원가입 시 자신의 아이디를 담기 위한 코드입니다.
-                            // 채팅방 진입 시 상대방 이름 불러올 때 활용됩니다.
-                            // getDisplayName() 같은 메소드 활용 시
-                            UserProfileChangeRequest userProfileChangeRequest
-                                    = new UserProfileChangeRequest.Builder().setDisplayName(dialog_editTextEmail.getText().toString()).build();
-                            task.getResult().getUser().updateProfile(userProfileChangeRequest);
-
-                            UserModel userModel = new UserModel();
-                            userModel.userEmail = dialog_editTextEmail.getText().toString().trim();
-                            userModel.userPhoneNumber = dialog_editTextPhoneNumber.getText().toString().trim();
-                            userModel.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                            // 매칭된 유저가 있는지 확인하는 int 변수입니다.
-                            userModel.caseNumber = 0;
-
-                            FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .setValue(userModel)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            Toast.makeText(LoginActivity.this, "회원가입이 완료되었습니다!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
                         }
+
+                        // 실제로 계정을 생성하는 메소드입니다.
+                        FirebaseAuth.getInstance()
+                                .createUserWithEmailAndPassword(dialog_editTextEmail.getText().toString().trim(), dialog_editTextPassword.getText().toString().trim())
+                                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        // 로그인 실패
+                                        if (!task.isSuccessful()) {
+                                            try {
+                                                // 실패할 경우 예외 처리를 실시합니다... 라는 뜻으로 보입니다?
+                                                throw task.getException();
+
+                                            } catch (FirebaseAuthUserCollisionException e) {
+                                                Toast.makeText(LoginActivity.this, "이미 존재하는 이메일입니다.", Toast.LENGTH_SHORT).show();
+
+                                            } catch (Exception e2) {
+                                                Toast.makeText(LoginActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(LoginActivity.this, "데이터베이스 입력 중 입니다.", Toast.LENGTH_SHORT).show();
+
+                                            // 회원가입한 유저의 uid를 바로 불러옵니다.
+                                            final String uid = task.getResult().getUser().getUid();
+
+                                            // 회원가입 시 자신의 아이디를 담기 위한 코드입니다.
+                                            // 채팅방 진입 시 상대방 이름 불러올 때 활용됩니다.
+                                            // getDisplayName() 같은 메소드 활용 시
+                                            UserProfileChangeRequest userProfileChangeRequest
+                                                    = new UserProfileChangeRequest.Builder().setDisplayName(dialog_editTextEmail.getText().toString()).build();
+                                            task.getResult().getUser().updateProfile(userProfileChangeRequest);
+
+                                            // 회원가입하는 유저의 정보를 생성하여 DB에 입력합니다.
+                                            UserModel userModel = new UserModel();
+                                            userModel.userEmail = dialog_editTextEmail.getText().toString().trim();
+                                            userModel.userPhoneNumber = dialog_editTextPhoneNumber.getText().toString().trim();
+                                            userModel.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                            // 매칭된 유저가 있는지 확인하는 int 변수입니다.
+                                            userModel.caseNumber = 0;
+
+                                            // 유저 정보 DB 입력
+                                            FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                    .setValue(userModel)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Toast.makeText(LoginActivity.this, "회원가입이 완료되었습니다!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
                 });
     }
