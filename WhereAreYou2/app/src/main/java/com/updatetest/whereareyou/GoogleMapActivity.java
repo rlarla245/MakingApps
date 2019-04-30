@@ -40,24 +40,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// 구글 맵과 현재 유저의 위치 정보를 불러오는 인터페이스 2개를 불러옵니다.
 public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
     // 변수들 선언
     FirebaseAuth auth = FirebaseAuth.getInstance();
     String myUid;
     String counterPartUid;
+
+    // 매칭 이후 액티비티 이므로 과거 시간대를 보여주는 새로운 메뉴가 필요합니다.
     ImageButton imageButtonMenu;
 
     // 위치 입력하기 위한 변수 설정
     LocationManager locationManager;
 
     // 위도, 경도
+    // 자료형이 더블이라는 걸 명심합니다.
     Double latitude = 0.0;
     Double longitude = 0.0;
 
     // 최근 위치
     Location recentLocation;
 
-    // 상대방 위치 불러올 리스트
+    // 상대방 위치들을 모으는 리스트
     List<LocationModel> locationModels = new ArrayList<>();
 
     @Override
@@ -69,8 +73,9 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
         counterPartUid = getIntent().getStringExtra("counterPartUid");
 
         // locationManager 설정
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
 
+        // 허가 확인을 하지 않으면 해당 메소드들을 사용할 수 없습니다.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // 어떤 방식으로 위치를 불러올지, 시간 간격, 몇 미터마다 갱신할 것인지, 리스너를 파라미터로 받습니다,
@@ -82,7 +87,9 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                 // 최근 위치 입력
                 recentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            } else {
+            }
+            // 네트워크 방식을 통한 위치 호출은 정확도가 급격히 떨어진다는 단점이 존재합니다.
+            else {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, this);
 
                 // 최근 위치 입력
@@ -114,9 +121,13 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
 
                             startActivity(new Intent(GoogleMapActivity.this, LoginActivity.class));
                         }
+
+                        // 과거 위치를 불러주는 액티비티로 넘깁니다.
+                        // if ()
                         return true;
                     }
                 });
+                // 메뉴를 띄웁니다.
                 menu.show();
             }
         });
@@ -125,10 +136,11 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
         myUid = auth.getCurrentUser().getUid();
 
         // 지도 불러오기
+        // 맵 프레그먼트를 불러옵니다.
         SupportMapFragment supportMapFragment
                 = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapfragment_mapfragment);
 
-        // 동기화 시킵니다.
+        // 해당 맵 프레그먼트를 인터페이스와 동기화 시킵니다.
         supportMapFragment.getMapAsync(this);
     }
 
@@ -147,7 +159,10 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                         LocationModel locationModel = new LocationModel();
                         // 위도 불러오기
                         double test = 0;
+                        // db에서 데이터를 불러올 땐 long 값으로 불러오므로
+                        // double형으로 다시 형변환 해줘야 합니다.
                         Number num = (Number) snapshot.child("latitude").getValue();
+                        // doubleValue()를 실행합니다.
                         test = num.doubleValue();
 
                         // 경도 불러오기
@@ -155,6 +170,7 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                         Number num2 = (Number) snapshot.child("longitude").getValue();
                         testLng = num2.doubleValue();
 
+                        // db 내 위도와, 경도를 받아옵니다.
                         locationModel.latitude = test;
                         locationModel.longitude = testLng;
                         locationModel.uid = counterPartUid;
@@ -163,19 +179,22 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                     }
                 }
 
+                // 위도, 경도를 받는 변수
                 LatLng counterPartLocation;
+
                 if (locationModels.size() != 0) {
                     // 좌표는 maps.google.com에서 구할 수 있음
                     counterPartLocation = new LatLng(locationModels.get(0).latitude,
                             locationModels.get(0).longitude);
-                    System.out.println("위도 경도 확인: " + locationModels.get(0).latitude + ", " + locationModels.get(0).longitude);
-                } else {
-                    counterPartLocation = new LatLng(0, 0);
+
+                }
+                // 상대방 위치 값이 저장되어 있지 않은 경우우
+                else {
+                   counterPartLocation = new LatLng(0, 0);
                 }
 
-                System.out.println("위도 경도 확인2: " + counterPartLocation);
-
                 // 마커를 찍을 장소와 이름을 지정합니다.
+                // 시간으로 설정하면 더 좋을 듯 합니다.
                 googleMap.addMarker(new MarkerOptions().position(counterPartLocation).title("현재 위치"));
 
                 // 마커를 누를 경우 그 장소를 확대해서 보여줍니다.
@@ -189,16 +208,20 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
+    // LocationListener에 필요한 메소드입니다.
     @Override
     public void onLocationChanged(final Location location) {
+        // 현재 위도와 경도 값을 받아옵니다.
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
+        // 데이터 모델에 맞게 포맷합니다.
         final LocationModel locationModel = new LocationModel();
         locationModel.latitude = latitude;
         locationModel.longitude = longitude;
         locationModel.uid = myUid;
 
+        // 위치 데이터를 입력합니다.
         FirebaseDatabase.getInstance().getReference().child("locations").child(myUid)
                 .setValue(locationModel)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

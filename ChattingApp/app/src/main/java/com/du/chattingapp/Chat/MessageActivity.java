@@ -198,7 +198,7 @@ public class MessageActivity extends AppCompatActivity {
                 // 해당 서버키를 입력합니다.
                 .addHeader("Authorization", "key=AIzaSyCDpcPkE61tZtjVRdO3JoJ9AhWdrqEwzFA")
                 // 이것도 맞는지 확인해야 합니다.
-                .url("https://gcm-http.googleapis.com/gcm/send")
+                .url("https://fcm.googleapis.com/fcm/send")
                 .post(requestBody)
                 .build();
 
