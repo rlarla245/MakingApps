@@ -4,4 +4,5 @@ public class LocationModel {
     public String uid;
     public Double latitude;
     public Double longitude;
+    public Object timestamp;
 }

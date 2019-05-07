@@ -20,6 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity" />
 
@@ -27,7 +28,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyArVfgx3k4s8snUUlHVUBVxzukHeHHEo7A" />
 
-        <activity android:name=".GoogleMapActivity"></activity>
+        <activity android:name=".GoogleMapActivity">
+        </activity>
+
+        <service android:name=".ServiceGoogleMap">
+        </service>
     </application>
 
 </manifest>

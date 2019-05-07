@@ -1,9 +1,13 @@
 package com.updatetest.whereareyou;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -351,6 +355,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         firebaseAuth.addAuthStateListener(authStateListener);
+
+        // 서비스 매칭
+        Intent serviceIntent = new Intent(this, ServiceGoogleMap.class);
+
+        stopService(serviceIntent);
+        System.out.println("service 확인: 서비스 종료");
     }
 
     // 앱 종료 혹은 가려질 때
@@ -360,5 +370,42 @@ public class LoginActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         firebaseAuth.removeAuthStateListener(authStateListener);
+    }
+
+    // foreground/background 확인
+    public static boolean isAppIsInBackground(Context context) {
+        // 초기값은 백그라운드 값으로 설정
+        boolean isInBackground = true;
+
+        // 상태 불러오기
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        // 킷캣이상
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                // 포그라운드 상태?
+                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    // 패키지 리스트 접근
+                    for (String activeProcess : processInfo.pkgList) {
+                        if (activeProcess.equals(context.getPackageName())) {
+                            isInBackground = false;
+                        }
+                    }
+                }
+            }
+        }
+        // 킷캣 이하
+        // GET_TASK Permission 필요하지만, depricated된 것으로 알고 있음
+        else {
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+            ComponentName componentInfo = taskInfo.get(0).topActivity;
+            if (componentInfo.getPackageName().equals(context.getPackageName())) {
+                isInBackground = false;
+            }
+        }
+
+        // 백그라운드일 때 true 리턴, 포그라운드일 때 false 리턴
+        return isInBackground;
     }
 }

@@ -16,6 +16,18 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/googlemap_floatingbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:src="@android:drawable/ic_dialog_map"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!--name 지정을 통해 맵 프레그먼트 기능을 활용할 수 있습니다.-->
     <fragment
         android:layout_marginTop="?android:attr/actionBarSize"

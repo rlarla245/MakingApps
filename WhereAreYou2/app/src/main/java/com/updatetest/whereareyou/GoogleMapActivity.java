@@ -1,14 +1,19 @@
 package com.updatetest.whereareyou;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -31,17 +36,20 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.updatetest.whereareyou.Models.LocationModel;
 
-import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 // 구글 맵과 현재 유저의 위치 정보를 불러오는 인터페이스 2개를 불러옵니다.
 public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+    // 날짜 찍기
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd HH시 mm분");
+
     // 변수들 선언
     FirebaseAuth auth = FirebaseAuth.getInstance();
     String myUid;
@@ -64,16 +72,68 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
     // 상대방 위치들을 모으는 리스트
     List<LocationModel> locationModels = new ArrayList<>();
 
+    // 플로팅 버튼 클릭을 통한 현재 위치로 이동
+    FloatingActionButton floatingActionButton;
+
+    // 서비스 인텐트 설정
+    Intent serviceIntent;
+
+    // foreground/background 확인
+    public static boolean isAppIsInBackground(Context context) {
+        // 초기값은 백그라운드 값으로 설정
+        boolean isInBackground = true;
+
+        // 상태 불러오기
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        // 킷캣이상
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                // 포그라운드 상태?
+                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    // 패키지 리스트 접근
+                    for (String activeProcess : processInfo.pkgList) {
+                        if (activeProcess.equals(context.getPackageName())) {
+                            isInBackground = false;
+                        }
+                    }
+                }
+            }
+        }
+        // 킷캣 이하
+        // GET_TASK Permission 필요하지만, depricated된 것으로 알고 있음
+        else {
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+            ComponentName componentInfo = taskInfo.get(0).topActivity;
+            if (componentInfo.getPackageName().equals(context.getPackageName())) {
+                isInBackground = false;
+            }
+        }
+
+        // 백그라운드일 때 true 리턴, 포그라운드일 때 false 리턴
+        return isInBackground;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_googlemap);
+        System.out.println("확인. reset 되는데?");
 
         // 상대방 uid 불러오기
         counterPartUid = getIntent().getStringExtra("counterPartUid");
 
         // locationManager 설정
-        locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        System.out.println("GoogleMapActivity 확인. locationManager: " + locationManager);
+
+        // 플로팅 버튼 불러오기
+        floatingActionButton = findViewById(R.id.googlemap_floatingbutton);
+
+        // 내 uid 불러오기
+        myUid = auth.getCurrentUser().getUid();
+        System.out.println("uid 확인: " + myUid);
 
         // 허가 확인을 하지 않으면 해당 메소드들을 사용할 수 없습니다.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -82,20 +142,88 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
             // 어디에 연결되었니? GPS || NETWORD
             // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100f, this);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
+                System.out.println("GoogleMapActivity 확인: GPS 위치 접근");
+                // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
                 // 최근 위치 입력
                 recentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                System.out.println("GoogleMapActivity 확인. 최근 위치: " + locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
 
+                if (recentLocation == null) {
+                    System.out.println("GoogleMapActivity 확인: recentLocation == null");
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                    recentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                } else {
+                    System.out.println("GoogleMapActivity 확인: recentLocation != null");
+                    // 위도 및 경도 값 불러오기
+                    latitude = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+                    longitude = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+
+                    // 데이터 모델에 맞게 포맷합니다.
+                    final LocationModel locationModel = new LocationModel();
+                    locationModel.latitude = latitude;
+                    locationModel.longitude = longitude;
+                    locationModel.uid = myUid;
+                    locationModel.timestamp = ServerValue.TIMESTAMP;
+
+                    // 위치 데이터를 입력합니다.
+                    FirebaseDatabase.getInstance().getReference().child("locations").child(myUid)
+                            .setValue(locationModel)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    //
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
             }
             // 네트워크 방식을 통한 위치 호출은 정확도가 급격히 떨어진다는 단점이 존재합니다.
             else {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, this);
+                System.out.println("GoogleMapActivity 확인: 기지국 위치 접근");
 
                 // 최근 위치 입력
                 recentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                if (recentLocation == null) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+                    recentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                } else {
+                    // 위도 및 경도 값 불러오기
+                    latitude = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude();
+                    longitude = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude();
+
+                    // 데이터 모델에 맞게 포맷합니다.
+                    final LocationModel locationModel = new LocationModel();
+                    locationModel.latitude = latitude;
+                    locationModel.longitude = longitude;
+                    locationModel.uid = myUid;
+                    locationModel.timestamp = ServerValue.TIMESTAMP;
+
+                    // 위치 데이터를 입력합니다.
+                    FirebaseDatabase.getInstance().getReference().child("locations").child(myUid)
+                            .setValue(locationModel)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    //
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
             }
         } else {
+            System.out.println("GoogleMapActivity 확인: 권한이 필요합니다.");
             Toast.makeText(this, "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
         }
 
@@ -132,9 +260,6 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
 
-        // 내 uid 불러오기
-        myUid = auth.getCurrentUser().getUid();
-
         // 지도 불러오기
         // 맵 프레그먼트를 불러옵니다.
         SupportMapFragment supportMapFragment
@@ -151,66 +276,95 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
         FirebaseDatabase.getInstance().getReference().child("locations")
                 //.child(counterPartUid)
                 .addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                locationModels.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if (snapshot.child("uid").getValue().equals(counterPartUid)) {
-                        LocationModel locationModel = new LocationModel();
-                        // 위도 불러오기
-                        double test = 0;
-                        // db에서 데이터를 불러올 땐 long 값으로 불러오므로
-                        // double형으로 다시 형변환 해줘야 합니다.
-                        Number num = (Number) snapshot.child("latitude").getValue();
-                        // doubleValue()를 실행합니다.
-                        test = num.doubleValue();
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        locationModels.clear();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            if (snapshot.child("uid").getValue().equals(counterPartUid)) {
+                                LocationModel locationModel = new LocationModel();
+                                // 위도 불러오기
+                                double test = 0;
+                                // db에서 데이터를 불러올 땐 long 값으로 불러오므로
+                                // double형으로 다시 형변환 해줘야 합니다.
+                                Number num = (Number) snapshot.child("latitude").getValue();
+                                // doubleValue()를 실행합니다.
+                                test = num.doubleValue();
 
-                        // 경도 불러오기
-                        double testLng = 0;
-                        Number num2 = (Number) snapshot.child("longitude").getValue();
-                        testLng = num2.doubleValue();
+                                // 경도 불러오기
+                                double testLng = 0;
+                                Number num2 = (Number) snapshot.child("longitude").getValue();
+                                testLng = num2.doubleValue();
 
-                        // db 내 위도와, 경도를 받아옵니다.
-                        locationModel.latitude = test;
-                        locationModel.longitude = testLng;
-                        locationModel.uid = counterPartUid;
+                                // db 내 위도와, 경도를 받아옵니다.
+                                locationModel.latitude = test;
+                                locationModel.longitude = testLng;
+                                locationModel.uid = counterPartUid;
+                                locationModel.timestamp = snapshot.child("timestamp").getValue();
 
-                        locationModels.add(locationModel);
+                                locationModels.add(locationModel);
+                            }
+                        }
+
+                        // 위도, 경도를 받는 변수
+                        final LatLng counterPartLocation;
+                        long timeNow;
+                        Date dateNow;
+                        final MarkerOptions newMarker;
+
+                        if (locationModels.size() != 0) {
+                            // 좌표는 maps.google.com에서 구할 수 있음
+                            counterPartLocation = new LatLng(locationModels.get(0).latitude,
+                                    locationModels.get(0).longitude);
+                            timeNow = (long) locationModels.get(0).timestamp;
+                            dateNow = new Date(timeNow);
+
+                            // 항상 title이 showing됩니다.
+                            newMarker = new MarkerOptions().position(counterPartLocation).title(simpleDateFormat.format(dateNow));
+                        }
+                        // 상대방 위치 값이 저장되어 있지 않은 경우우
+                        else {
+                            counterPartLocation = new LatLng(0, 0);
+                            timeNow = 0;
+                            dateNow = new Date(timeNow);
+
+                            // 항상 title이 showing됩니다.
+                            newMarker = new MarkerOptions().position(counterPartLocation).title("위치 정보 알 수 없음");
+                        }
+
+                        googleMap.addMarker(newMarker).showInfoWindow();
+
+                        // 마커를 누를 경우 그 장소를 확대해서 보여줍니다.
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(counterPartLocation, 17));
+
+                        // 플로팅 버튼을 통해 현재 위치로 이동합니다.
+                        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(counterPartLocation)      // Sets the center of the map to Mountain View
+                                        .zoom(17)                   // Sets the zoom
+                                        .bearing(10)                // Sets the orientation of the camera to east
+                                        .tilt(5)                   // Sets the tilt of the camera to 30 degrees
+                                        .build();                   // Creates a CameraPosition from the builder
+                                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                                // 눈 속임
+                                googleMap.addMarker(newMarker).showInfoWindow();
+                            }
+                        });
                     }
-                }
 
-                // 위도, 경도를 받는 변수
-                LatLng counterPartLocation;
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                if (locationModels.size() != 0) {
-                    // 좌표는 maps.google.com에서 구할 수 있음
-                    counterPartLocation = new LatLng(locationModels.get(0).latitude,
-                            locationModels.get(0).longitude);
-
-                }
-                // 상대방 위치 값이 저장되어 있지 않은 경우우
-                else {
-                   counterPartLocation = new LatLng(0, 0);
-                }
-
-                // 마커를 찍을 장소와 이름을 지정합니다.
-                // 시간으로 설정하면 더 좋을 듯 합니다.
-                googleMap.addMarker(new MarkerOptions().position(counterPartLocation).title("현재 위치"));
-
-                // 마커를 누를 경우 그 장소를 확대해서 보여줍니다.
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(counterPartLocation, 17));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+                    }
+                });
     }
 
     // LocationListener에 필요한 메소드입니다.
     @Override
     public void onLocationChanged(final Location location) {
+        System.out.println("googlemap activity 확인: onLocationChanged 접근 완료");
         // 현재 위도와 경도 값을 받아옵니다.
         latitude = location.getLatitude();
         longitude = location.getLongitude();
@@ -220,6 +374,7 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
         locationModel.latitude = latitude;
         locationModel.longitude = longitude;
         locationModel.uid = myUid;
+        locationModel.timestamp = ServerValue.TIMESTAMP;
 
         // 위치 데이터를 입력합니다.
         FirebaseDatabase.getInstance().getReference().child("locations").child(myUid)
@@ -251,5 +406,27 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // 서비스 매칭
+        Intent serviceIntent = new Intent(this, ServiceGoogleMap.class);
+
+        // 서비스 시작
+        startService(serviceIntent);
+        System.out.println("service 확인: 서비스 시작");
+    }
+
+    @Override
+    protected void onResume() {
+        System.out.println("resume 확인");
+        super.onResume();
+        // 서비스 매칭
+        Intent serviceIntent = new Intent(this, ServiceGoogleMap.class);
+
+        stopService(serviceIntent);
+        System.out.println("service 확인: 서비스 종료");
     }
 }

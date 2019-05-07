@@ -11,19 +11,11 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.du.chattingapp.Models.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SplashActivity extends AppCompatActivity {
     // Test
@@ -76,6 +68,7 @@ public class SplashActivity extends AppCompatActivity {
     // 메시지 띄우기
     void displayMessage() {
         String splash_background = mFirebaseRemoteConfig.getString("splash_background");
+        System.out.println("색 확인: " + mFirebaseRemoteConfig.getString("splash_background"));
         boolean caps = mFirebaseRemoteConfig.getBoolean("splash_caps");
         String splash_message = mFirebaseRemoteConfig.getString("splash_message");
 
