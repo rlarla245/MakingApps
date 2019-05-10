@@ -67,7 +67,7 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
     Double longitude = 0.0;
 
     // 최근 위치
-    Location recentLocation;
+    public static Location recentLocation;
 
     // 상대방 위치들을 모으는 리스트
     List<LocationModel> locationModels = new ArrayList<>();
@@ -75,10 +75,7 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
     // 플로팅 버튼 클릭을 통한 현재 위치로 이동
     FloatingActionButton floatingActionButton;
 
-    // 서비스 인텐트 설정
-    Intent serviceIntent;
-
-    // foreground/background 확인
+    // 서비스 종료 여부를 판단하기 위한 foreground/background 확인
     public static boolean isAppIsInBackground(Context context) {
         // 초기값은 백그라운드 값으로 설정
         boolean isInBackground = true;
@@ -119,28 +116,26 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_googlemap);
-        System.out.println("확인. reset 되는데?");
 
         // 상대방 uid 불러오기
         counterPartUid = getIntent().getStringExtra("counterPartUid");
 
         // locationManager 설정
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        System.out.println("GoogleMapActivity 확인. locationManager: " + locationManager);
+        // System.out.println("GoogleMapActivity 확인. locationManager: " + locationManager);
 
         // 플로팅 버튼 불러오기
         floatingActionButton = findViewById(R.id.googlemap_floatingbutton);
 
         // 내 uid 불러오기
         myUid = auth.getCurrentUser().getUid();
-        System.out.println("uid 확인: " + myUid);
 
-        // 허가 확인을 하지 않으면 해당 메소드들을 사용할 수 없습니다.
+        // 위치 제공 확인을 하지 않으면 해당 메소드들을 사용할 수 없습니다.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // 어떤 방식으로 위치를 불러올지, 시간 간격, 몇 미터마다 갱신할 것인지, 리스너를 파라미터로 받습니다,
-            // 어디에 연결되었니? GPS || NETWORD
             // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100f, this);
+            // 어디에서 위치값을 받는가? GPS || NETWORK
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 System.out.println("GoogleMapActivity 확인: GPS 위치 접근");
                 // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -149,21 +144,29 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                 recentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 System.out.println("GoogleMapActivity 확인. 최근 위치: " + locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
 
+                // 최근 위치가 없을 경우
                 if (recentLocation == null) {
                     System.out.println("GoogleMapActivity 확인: recentLocation == null");
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                    // 최근 위치가 없으므로 새로운 위치 값을 받아옵니다.
+                    // 5초, 10미터
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
                     recentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                } else {
-                    System.out.println("GoogleMapActivity 확인: recentLocation != null");
+                    System.out.println("GoogleMapActivity 위치 재호출 확인: " + recentLocation);
+                }
+
+                // 최근 위치가 있을 경우
+                else {
                     // 위도 및 경도 값 불러오기
                     latitude = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
                     longitude = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
 
+                    // 최근 위치를 서버에 찍어줍니다.
                     // 데이터 모델에 맞게 포맷합니다.
                     final LocationModel locationModel = new LocationModel();
                     locationModel.latitude = latitude;
                     locationModel.longitude = longitude;
                     locationModel.uid = myUid;
+                    // 현재 시간
                     locationModel.timestamp = ServerValue.TIMESTAMP;
 
                     // 위치 데이터를 입력합니다.
@@ -172,17 +175,24 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    //
+                                    // 위치 데이터 입력 성공
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.\n관리자에게 문의바랍니다.", Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+                    // 새로운 위치 값을 불러옵니다.
+                    // 해당 코드가 없으면 바뀐 위치 값을 불러오지 않는 듯(리스너 자체에 접근이 안되므로)
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
+                    // 후...
+                    onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
                 }
             }
+
             // 네트워크 방식을 통한 위치 호출은 정확도가 급격히 떨어진다는 단점이 존재합니다.
             else {
                 System.out.println("GoogleMapActivity 확인: 기지국 위치 접근");
@@ -190,10 +200,15 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                 // 최근 위치 입력
                 recentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
+                // 최근 위치가 없는 경우
                 if (recentLocation == null) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+                    // 위치 값 요청
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 10, this);
                     recentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                } else {
+                }
+
+                // 최근 위치가 있는 경우
+                else {
                     // 위도 및 경도 값 불러오기
                     latitude = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude();
                     longitude = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude();
@@ -211,18 +226,24 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    //
+                                    // 위치 데이터 입력 성공
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.\n관리자에게 문의바랍니다.", Toast.LENGTH_SHORT).show();
                                 }
                             });
+                    // 새로운 위치값을 불러옵니다.
+                    // 마찬가지로 해당 코드가 없으면 리스너에 접근하지 않아 변경되는 위치 값을 받아오지 않습니다.
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
                 }
             }
-        } else {
+        }
+
+        // 위치 확인 권한이 없을 경우
+        else {
             System.out.println("GoogleMapActivity 확인: 권한이 필요합니다.");
             Toast.makeText(this, "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
         }
@@ -265,16 +286,17 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
         SupportMapFragment supportMapFragment
                 = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapfragment_mapfragment);
 
-        // 해당 맵 프레그먼트를 인터페이스와 동기화 시킵니다.
+        // 해당 맵 프레그먼트를 구글 지도 인터페이스와 동기화 시킵니다.
         supportMapFragment.getMapAsync(this);
     }
 
     // 지도가 준비되었을 경우
-    // 지도를 불러올 때 상태를 보여줍니다.
+    // 디바이스가 구글 지도를 불러올 때 코드를 입력합니다.
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         FirebaseDatabase.getInstance().getReference().child("locations")
                 //.child(counterPartUid)
+                // 데이터 변경이 있을 시 계속해서 위치 값을 불러옵니다.
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -282,6 +304,7 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             if (snapshot.child("uid").getValue().equals(counterPartUid)) {
                                 LocationModel locationModel = new LocationModel();
+
                                 // 위도 불러오기
                                 double test = 0;
                                 // db에서 데이터를 불러올 땐 long 값으로 불러오므로
@@ -301,51 +324,62 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                                 locationModel.uid = counterPartUid;
                                 locationModel.timestamp = snapshot.child("timestamp").getValue();
 
+                                // 리스트에 위치 모델값을 담습니다.
                                 locationModels.add(locationModel);
                             }
                         }
 
                         // 위도, 경도를 받는 변수
                         final LatLng counterPartLocation;
+
+                        // 마커에 시간 값을 담습니다.
                         long timeNow;
                         Date dateNow;
+
+                        // 위치 변경에 따라 찍는 마커들
                         final MarkerOptions newMarker;
 
+                        // 상대방 위치 정보가 있을 경우
                         if (locationModels.size() != 0) {
                             // 좌표는 maps.google.com에서 구할 수 있음
                             counterPartLocation = new LatLng(locationModels.get(0).latitude,
                                     locationModels.get(0).longitude);
+
+                            // unixTime을 dateFormat시킴
                             timeNow = (long) locationModels.get(0).timestamp;
                             dateNow = new Date(timeNow);
 
                             // 항상 title이 showing됩니다.
                             newMarker = new MarkerOptions().position(counterPartLocation).title(simpleDateFormat.format(dateNow));
                         }
-                        // 상대방 위치 값이 저장되어 있지 않은 경우우
+
+                        // 상대방 위치 값이 저장되어 있지 않은 경우
+                        // 초기값을 설정해줍니다. 안해주면 틩기니까
                         else {
                             counterPartLocation = new LatLng(0, 0);
-                            timeNow = 0;
-                            dateNow = new Date(timeNow);
 
                             // 항상 title이 showing됩니다.
                             newMarker = new MarkerOptions().position(counterPartLocation).title("위치 정보 알 수 없음");
                         }
 
+                        // 항상 마커를 띄웁니다.
                         googleMap.addMarker(newMarker).showInfoWindow();
 
                         // 마커를 누를 경우 그 장소를 확대해서 보여줍니다.
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(counterPartLocation, 17));
 
-                        // 플로팅 버튼을 통해 현재 위치로 이동합니다.
+                        // 플로팅 버튼을 통해 입력된 최근 위치로 이동합니다.
                         floatingActionButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                // 타겟팅 및 애니메이션 효과 입력
                                 CameraPosition cameraPosition = new CameraPosition.Builder()
                                         .target(counterPartLocation)      // Sets the center of the map to Mountain View
                                         .zoom(17)                   // Sets the zoom
                                         .bearing(10)                // Sets the orientation of the camera to east
                                         .tilt(5)                   // Sets the tilt of the camera to 30 degrees
                                         .build();                   // Creates a CameraPosition from the builder
+                                // 애니메이션 효과 실행
                                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                                 // 눈 속임
@@ -362,9 +396,11 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     // LocationListener에 필요한 메소드입니다.
+    // 위치 값이 변경되면 자동으로 불러옵니다.
     @Override
     public void onLocationChanged(final Location location) {
-        System.out.println("googlemap activity 확인: onLocationChanged 접근 완료");
+        System.out.println("googlemap activity 위치 값 변경 확인: onLocationChanged 접근 완료");
+
         // 현재 위도와 경도 값을 받아옵니다.
         latitude = location.getLatitude();
         longitude = location.getLongitude();
@@ -382,13 +418,13 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        //
+                        // 위치 데이터 입력 성공
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GoogleMapActivity.this, "위치 입력에 실패했습니다.\n관리자에게 문의바랍니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -408,6 +444,7 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     }
 
+    // 화면이 가려지거나 백그라운드로 넘어갈 때 실행되는 메소드입니다.
     @Override
     protected void onPause() {
         super.onPause();
@@ -421,7 +458,6 @@ public class GoogleMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     protected void onResume() {
-        System.out.println("resume 확인");
         super.onResume();
         // 서비스 매칭
         Intent serviceIntent = new Intent(this, ServiceGoogleMap.class);

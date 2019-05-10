@@ -1,7 +1,6 @@
 package com.updatetest.whereareyou;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -60,13 +59,15 @@ public class ServiceGoogleMap extends Service implements LocationListener {
                         @Override
                         public void run() {
                             while (true) {
-                                // 앱이 포그라운드 상태에 있을 때
-                                if (!GoogleMapActivity.isAppIsInBackground(getApplicationContext())) {
-                                    break;
-                                }
+                                System.out.println("확인: 반복문");
 
-                                if (!LoginActivity.isAppIsInBackground(getApplicationContext())) {
-                                    break;
+                                // 5초씩 끊습니다.
+                                // 강제로 sleep 메소드 사용
+                                try {
+                                    Thread.sleep(10000);
+                                } catch (InterruptedException e) {
+                                    System.out.println("service 에러: " + e.getMessage());
+                                    e.printStackTrace();
                                 }
 
                                 // locationManager 설정
@@ -76,38 +77,83 @@ public class ServiceGoogleMap extends Service implements LocationListener {
                                 if (ContextCompat.checkSelfPermission(ServiceGoogleMap.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                                         && ContextCompat.checkSelfPermission(ServiceGoogleMap.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                     // 어떤 방식으로 위치를 불러올지, 시간 간격, 몇 미터마다 갱신할 것인지, 리스너를 파라미터로 받습니다,
-                                    // 어디에 연결되었니? GPS || NETWORD
+                                    // 어디에 연결되었니? GPS || NETWORK
                                     // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100f, this);
                                     if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                                        // 최근 위치가 없을 경우
                                         if (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) == null) {
-                                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, ServiceGoogleMap.this);
-                                        } else {
+                                            System.out.println("service 확인: 최근 위치 없음");
+                                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ServiceGoogleMap.this);
+                                            try {
+                                                // onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+                                            } catch (NullPointerException e) {
+
+                                            }
+                                        }
+
+                                        // 최근 위치가 있을 경우
+                                        else {
                                             // 위치 변경 시 호출
-                                            onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-                                            System.out.println("service 확인 gps 위치: " + locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+                                            System.out.println("service 확인 최근 위치: " + locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+                                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ServiceGoogleMap.this);
+                                            try {
+                                                // (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+                                            } catch (NullPointerException e) {
+
+                                            }
                                         }
                                     }
+
                                     // 네트워크 방식을 통한 위치 호출은 정확도가 급격히 떨어진다는 단점이 존재합니다.
                                     else {
                                         if (locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null) {
-                                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, ServiceGoogleMap.this);
+                                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ServiceGoogleMap.this);
+                                            try {
+                                                // onLocationChanged(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+                                            } catch (NullPointerException e) {
+
+                                            }
                                         } else {
                                             // 위치 변경 시 호출
-                                            onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-                                            System.out.println("service 확인 기지국 위치: " + locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+                                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ServiceGoogleMap.this);
+                                            try {
+                                                // onLocationChanged(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+                                            } catch (NullPointerException e) {
+
+                                            }
+                                            System.out.println("service 확인 기지국 위치: " + GoogleMapActivity.recentLocation);
                                         }
                                     }
-                                } else {
+                                }
+
+                                // 권한이 없을 경우 -> 사실상 불가할텐데?
+                                else {
                                     Toast.makeText(ServiceGoogleMap.this, "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+                                }
+
+                                // 앱이 포그라운드 상태에 있을 때
+                                if (!GoogleMapActivity.isAppIsInBackground(getApplicationContext())) {
+                                    System.out.println("ServiceGoogleMap 확인: 지도 프레그먼트 포그라운드 -> 서비스 종료");
+                                    break;
+                                }
+
+                                if (!LoginActivity.isAppIsInBackground(getApplicationContext())) {
+                                    System.out.println("ServiceGoogleMap 확인: 로그인 액티비티 포그라운드 -> 서비스 종료");
+                                    break;
                                 }
                             }
                         }
                     });
                 }
-            }).start();
+            })
+                    // 스레드 시작
+                    .start();
+
+            // 서비스 종료를 막습니다.
             return START_STICKY;
         } catch (NullPointerException e) {
-            //
+            // uid가 null인 경우
+            // 서비스가 오류날 경우 바로 종료하도록
             return START_NOT_STICKY;
         }
     }
