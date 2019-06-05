@@ -18,10 +18,14 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 public class SplashActivity extends AppCompatActivity {
-    // Test
+    // 내 uid
+    // 계정 삭제 오류 방지 변수인 듯
     public String mainUid;
 
+    // 레이아웃 호출
     private LinearLayout SplashActivityLinearLayout;
+
+    // Firebase 원격 호출 기능
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
@@ -30,8 +34,13 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         try {
+            // 현재 접속한 유저 값
             mainUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        } catch (NullPointerException e) {
+        }
+
+        catch (NullPointerException e) {
+            // 없으면 로그아웃
+            // 없는데 어떻게 로그아웃이 되니;;
             FirebaseAuth.getInstance().signOut();
         }
 
@@ -42,7 +51,7 @@ public class SplashActivity extends AppCompatActivity {
         // 레이아웃 호출
         SplashActivityLinearLayout = (LinearLayout) findViewById(R.id.SplashActivity_linearLayout);
 
-        // 디버그 값 호출
+        // 원격 기능 호출 - 관리자 모드
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
                 .setDeveloperModeEnabled(BuildConfig.DEBUG)
@@ -59,7 +68,7 @@ public class SplashActivity extends AppCompatActivity {
                         } else {
 
                         }
-                        // alertBuilder 메시지를 입력합니다.
+                        // 입력해 둔 dialog Message가 출력됩니다.
                         displayMessage();
                     }
                 });
@@ -67,9 +76,13 @@ public class SplashActivity extends AppCompatActivity {
 
     // 메시지 띄우기
     void displayMessage() {
+        // 배경 색
         String splash_background = mFirebaseRemoteConfig.getString("splash_background");
-        System.out.println("색 확인: " + mFirebaseRemoteConfig.getString("splash_background"));
+
+        // 접속 허가 여부
         boolean caps = mFirebaseRemoteConfig.getBoolean("splash_caps");
+
+        // 발생 메시지
         String splash_message = mFirebaseRemoteConfig.getString("splash_message");
 
         // 백그라운드 색 지정
@@ -77,7 +90,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // 서버 점검 시 유저의 앱 사용을 막습니다.
         // 보완 방법 중 하나로 유저가 확인 버튼 외에 화면 클릭이 불가하도록 만들면 좋을 것 같습니다.
-        // 오버라이딩 가능한지 확인하면 좋을 듯
+        // gps 앱 코드 참조
         if (caps) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(splash_message).setPositiveButton("확인", new DialogInterface.OnClickListener() {
@@ -96,6 +109,8 @@ public class SplashActivity extends AppCompatActivity {
 
             } catch (NullPointerException e) {
                 Toast.makeText(this, "존재하지 않는 계정입니다. 종료합니다.", Toast.LENGTH_SHORT).show();
+                // 없는 계정은 어차피 로그아웃이 불가
+                // 이렇게 종료 시키는 게 옳은 방법
                 finish();
             }
 

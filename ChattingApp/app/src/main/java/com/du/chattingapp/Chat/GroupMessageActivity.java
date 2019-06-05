@@ -66,8 +66,10 @@ public class GroupMessageActivity extends AppCompatActivity {
 
     // 필요한 변수 생성
     Map<String, UserModel> users = new HashMap<>();
+
     String destinationRoom;
     String uid;
+
     EditText editText;
     TextView chatUsersName, temporaryUserName;
     Button input_button;
@@ -81,10 +83,14 @@ public class GroupMessageActivity extends AppCompatActivity {
 
     // 실제 대화에 참여하는 유저들만 불러옵니다.
     List<String> takeUsers;
+
     // 마찬가지로 몇 명이 대화에 참여하는지 확인하는 메소드입니다.
     int peopleCount = 0;
+
     // 연도 – 월 – 일 – 시간 – 분
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm");
+
+    // 이미지 uri
     private Uri uploadImageUri;
 
     @Override
@@ -96,7 +102,9 @@ public class GroupMessageActivity extends AppCompatActivity {
 
         // 변수 호출
         destinationRoom = getIntent().getStringExtra("destinationRoom");
+
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         editText = (EditText) findViewById(R.id.groupmessageactivity_inputtext);
         input_button = (Button) findViewById(R.id.groupmessageactivity_inputbutton);
         chatUsersName = (TextView) findViewById(R.id.groupmessageactivity_textview_who);
@@ -113,28 +121,36 @@ public class GroupMessageActivity extends AppCompatActivity {
             }
         });
 
-
         takeUsers = new ArrayList<>();
+
         // 해당 대화에 참여하는 사람들만 불러와봅시다.
-        FirebaseDatabase.getInstance().getReference().child("chatrooms").child(destinationRoom).child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("chatrooms")
+                .child(destinationRoom).child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 takeUsers.clear();
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     // 내 uid는 빼자
                     if (!uid.equals(snapshot.getKey())) {
+                        // users 정보
                         FirebaseDatabase.getInstance().getReference().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
                                     UserModel chatUserModel = snapshot1.getValue(UserModel.class);
+                                    // 채팅방 속 유저 == 유저 데이터 속 일치하는 유저
                                     if (snapshot.getKey().equals(chatUserModel.uid)) {
+                                        // 마지막 ,처리 때문에 임시 변수에 값을 저장합니다.
                                         temporaryUserName.append(chatUserModel.userName + ", ");
                                     }
                                 }
 
+                                // 반복문 다 돈 상태에서
+                                // 마지막 ,를 삭제합니다.
                                 try {
+                                    // char 배열로 쪼갭니다.
                                     CharSequence tests = temporaryUserName.getText();
+                                    // 제거합니다.
                                     final CharSequence test2 = tests.subSequence(0, tests.length() - 2);
                                     chatUsersName.setText(test2);
 
@@ -145,7 +161,10 @@ public class GroupMessageActivity extends AppCompatActivity {
                                             Toast.makeText(GroupMessageActivity.this, test2 + " 유저와 채팅하고 있습니다.", Toast.LENGTH_SHORT).show();
                                         }
                                     });
-                                } catch (StringIndexOutOfBoundsException e) {
+                                }
+
+                                // 계정 삭제 시
+                                catch (StringIndexOutOfBoundsException e) {
                                     chatUsersName.setText("알 수 없음");
                                 }
                         }
@@ -169,12 +188,10 @@ public class GroupMessageActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference().child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // 데이터 내부 값들을 받아올 수 있는 코드네요.
                 // 데이터 값들을 UserModel로 캐스팅해서 불러옵니다.
                 for (DataSnapshot item : dataSnapshot.getChildren()) {
                     // 결국, key - 유저 uid, value - 해당 유저 모델
                     // 결국 모든 유저들을 다 불러오는 메소드
-                    Log.d("키 값", item.getKey());
                     users.put(item.getKey(), item.getValue(UserModel.class));
                 }
                 input();
@@ -212,12 +229,13 @@ public class GroupMessageActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         // 채팅방 유저들을 불러옵니다.
-                        FirebaseDatabase.getInstance().getReference().child("chatrooms").child(destinationRoom).child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference().child("chatrooms")
+                                .child(destinationRoom).child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 // 해시맵 형태로 데이터를 불러옵니다.
                                 Map<String, Boolean> map = (Map<String, Boolean>) dataSnapshot.getValue();
-/*-----------------------------------------------------------------------------------------------------------*/
+
                                 try {
                                     // 유저의 uid 값만 불러옵니다.
                                     for (String item : map.keySet()) {
@@ -231,9 +249,8 @@ public class GroupMessageActivity extends AppCompatActivity {
                                     return;
                                 }
 
+                                // 단체 채팅방 속 유저들에게 푸시 메시지를 전송합니다.
                                 for (String tokens : pushTokens) {
-                                    // System.out.println("토큰 푸시 메시지 전송 중입니다.....");
-                                    // System.out.println("토큰 확인: " + tokens);
                                     sendGcm(tokens, comment.message);
                                 }
                                 pushTokens.clear();
@@ -279,7 +296,7 @@ public class GroupMessageActivity extends AppCompatActivity {
                 // 해당 서버키를 입력합니다.
                 .addHeader("Authorization", "key=AIzaSyCDpcPkE61tZtjVRdO3JoJ9AhWdrqEwzFA")
                 // 이것도 맞는지 확인해야 합니다.
-                .url("https://gcm-http.googleapis.com/gcm/send")
+                .url("https://fcm.googleapis.com/fcm/send")
                 .post(requestBody)
                 .build();
 
@@ -477,8 +494,6 @@ public class GroupMessageActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
             GroupMessageViewHolder messageViewHolder = ((GroupMessageViewHolder) holder);
 
-            System.out.println("이미지 url: " + comments.get(position).photoUri);
-
             try {
                 messageViewHolder.textView_name.setText(users.get(comments.get(position).uid).userName);
             } catch (NullPointerException e) {
@@ -534,9 +549,9 @@ public class GroupMessageActivity extends AppCompatActivity {
                 messageViewHolder.linearLayout_main.setGravity(Gravity.RIGHT);
                 messageViewHolder.textview_timestamp.setGravity(Gravity.RIGHT);
                 setReadCounter(position, messageViewHolder.textView_readCounter_left);
-
             }
 
+            // 내 채팅이 아닌 경우
             else {
                 try {
                     Glide.with(holder.itemView.getContext()).load(users.get(comments.get(position).uid).profileImageUri)
@@ -548,7 +563,9 @@ public class GroupMessageActivity extends AppCompatActivity {
                     // 이름에 DB 유저 네임을 불러옵니다.
                     messageViewHolder.textView_name.setText(users.get(comments.get(position).uid).userName);
                     messageViewHolder.linearLayout_destination.setVisibility(View.VISIBLE);
-                } catch (NullPointerException e) {
+                }
+                // 삭제 유저
+                catch (NullPointerException e) {
                     Glide.with(holder.itemView.getContext()).load(R.drawable.academy_logo)
                             // 원형 이미지로 호출
                             .apply(new RequestOptions().circleCrop())

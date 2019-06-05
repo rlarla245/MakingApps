@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
+    // 위젯 호출
     public static EditText idTextView;
     EditText passwordTextView;
     Button loginButton;
@@ -41,10 +42,11 @@ public class LoginActivity extends AppCompatActivity {
     // 로그인 확인 메소드
     FirebaseAuth.AuthStateListener authStateListener;
 
+    // Firebase 데이터베이스 호출
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference = database.getReference();
 
-    // FirstActivity로 상대방 uid를 넘겨줍니다.
+    // FirstActivity로 상대방 uid와 룸 uid를 넘겨줍니다.
     String destiUid;
     String destiRoomUid;
 
@@ -61,12 +63,17 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // SplashActivity에서 넘어온 uid 값을 입력합니다.
         if (getIntent().getStringExtra("mainUid") != null) {
             mainUid = getIntent().getStringExtra("mainUid");
         }
 
+        // caseNumber는 접속 루트
         if (getIntent().getStringExtra("mainUid") == null
+                // ||이 맞는 표현인데? -> 둘 중에 하나라도 없으면 종료시켜야지.
                 && getIntent().getStringExtra("caseNumber") == null) {
+            // 마찬가지로 signOut이 아니라 finish()가 맞지.
+            // 계정이 없는데 어케 로그아웃을 함
             FirebaseAuth.getInstance().signOut();
         }
 
@@ -75,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         // 상대방 uid
         destiUid = getIntent().getStringExtra("destinationUid");
 
-        // 단체 채팅방
+        // 룸 uid 불러 옴. 단체 채팅방에 활용됨
         destiRoomUid = getIntent().getStringExtra("destinationRoomUid");
 
         // 버튼 및 텍스트 뷰 불러오기
@@ -88,8 +95,11 @@ public class LoginActivity extends AppCompatActivity {
         // 로그아웃 메소드를 잠깐 불러옵시다.
         // firebaseAuth.signOut();
 
+        // 상태 창 색 변경
+        // getWindow().setStatusBarColor(Color.parseColor(splash_background));
+
+        // 원격 기능 활용 시
         /*
-        // 버튼을 원격으로 색 변경할 시
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         String splash_background = mFirebaseRemoteConfig.getString("splash_background");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -107,17 +117,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 아이디 칸이 공백이고, 패스워드 칸이 공백일 경우
-                // 비회원 페이지로 이동됩니다.
-
+                // "계정 입력이 필요합니다." 출력
                 if (idTextView.getText().toString().trim().equals("")
                         && passwordTextView.getText().toString().trim().equals("")) {
                     Toast.makeText(LoginActivity.this, "계정 입력이 필요합니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-
                 // 패스워드를 입력하지 않았을 경우
-                if (!idTextView.getText().toString().trim().equals("") && passwordTextView.getText().toString().trim().equals("")) {
+                if (!idTextView.getText().toString().trim().equals("")
+                        && passwordTextView.getText().toString().trim().equals("")) {
                     Toast.makeText(LoginActivity.this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -128,13 +137,15 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                // 실제로 로그인을 진행합니다. -> "여부"만 불러옵니다.
+                // 실제로 로그인을 진행합니다. -> 로그인 된 "여부"만 불러옵니다.
+                // 실제로 인텐트를 넘기는 건 리스너가 합니다.
                 else {
                     loginEvent();
                 }
             }
         });
 
+        // Firebase 계정 변수입니다.
         firebaseAuth = FirebaseAuth.getInstance();
 
         // 로그인 인터페이스 리스너(아이디와 비밀번호가 일치할 시 다음 화면으로 넘어갑니다)
@@ -142,9 +153,10 @@ public class LoginActivity extends AppCompatActivity {
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                // user 변수는 서버에 있는 유저를 받아옵니다.
+                // user 변수는 로그인된 현재 유저를 불러옵니다.
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
 
+                // db 값에서 유저 데이터를 불러옵니다.
                 databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -156,10 +168,12 @@ public class LoginActivity extends AppCompatActivity {
                         // 1:1 대화로 넘기기
                         if (getIntent().getStringExtra("caseNumber") != null &&
                                 user != null && getIntent().getStringExtra("caseNumber").equals("0")) {
-                            Log.d("Login Act", "1:1 채팅");
+                            System.out.println("LoginActivity 로그인 경로 확인: 1:1 채팅");
+
                             // 로그인
                             Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                             Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
+                            // 상대방 uid 및 경로 여부를 인텐트에 넘깁니다.
                             firstActivityIntent.putExtra("destinationUid", destiUid);
                             firstActivityIntent.putExtra("caseNumber", "0");
                             startActivity(firstActivityIntent);
@@ -169,10 +183,12 @@ public class LoginActivity extends AppCompatActivity {
                         // 1:多 대화로 넘기기
                         else if (getIntent().getStringExtra("caseNumber") != null &&
                                 user != null && getIntent().getStringExtra("caseNumber").equals("1")) {
-                            Log.d("Login Act", "1:多 채팅");
+                            System.out.println("LoginActivity 로그인 경로 확인: 1:多 채팅");
+
                             // 로그인
                             Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                             Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
+                            // 채팅방 룸 uid(단체 채팅방) 및 경로 여부를 인텐트에 넘깁니다.
                             firstActivityIntent.putExtra("destinationRoomUid", destiRoomUid);
                             firstActivityIntent.putExtra("caseNumber", "1");
                             startActivity(firstActivityIntent);
@@ -182,10 +198,12 @@ public class LoginActivity extends AppCompatActivity {
                         // 게시판으로 넘기기
                         else if (getIntent().getStringExtra("caseNumber") != null &&
                                 user != null && getIntent().getStringExtra("caseNumber").equals("2")) {
-                            Log.d("Login Act", "게시판 이동");
+                            System.out.println("LoginActivity 로그인 경로 확인: 게시판 이동");
+
                             // 로그인
                             Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
                             Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
+                            // 로그인 경로만 넘김
                             firstActivityIntent.putExtra("caseNumber", "2");
                             startActivity(firstActivityIntent);
                             finish();
@@ -193,30 +211,42 @@ public class LoginActivity extends AppCompatActivity {
 
                         // 일반 접속
                         else if (user != null) {
-                            Log.d("Login Act", "일반 접속");
+                            System.out.println("LoginActivity 로그인 경로 확인: 일반 접속");
 
                             // 지금 유저의 uid 값을 불러옵니다.
                             mainUid = user.getUid();
 
+                            // 왜 서버에서 계정 존재 여부를 확인하는 거지?
                             for (UserModel userModel : testUsers) {
-                                System.out.println("criteriaNumber 확인 1: " + criteriaNumber);
-                                System.out.println("LoginActivity.mainUid 반복문 확인: " + mainUid);
-                                System.out.println("LoginActivity.userModel 반복문 확인: " + userModel.uid);
+                                System.out.println("LoginActivity criteriaNumber 확인 1: " + criteriaNumber);
+                                // System.out.println("LoginActivity.mainUid 반복문 확인: " + mainUid);
+                                // System.out.println("LoginActivity.userModel 반복문 확인: " + userModel.uid);
+
+                                // 서버 내 데이터와 접속 계정의 uid가 일치할 경우
+                                // 이 또한, 계정 삭제 시 발생하는 NullPointerException 에러를 방지하기 위함인 듯?
                                 if (userModel.uid.equals(mainUid)) {
                                     criteriaNumber = 1;
-                                    System.out.println("criteriaNumber 확인 2: " + criteriaNumber);
+                                    // System.out.println("criteriaNumber 확인 2: " + criteriaNumber);
                                 }
                             }
 
+                            // 존재하는 계정인 경우
                             if (criteriaNumber == 1) {
                                 Toast.makeText(LoginActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+
+                                // 인텐트를 실질적으로 넘겨줍니다.
                                 Intent firstActivityIntent = new Intent(LoginActivity.this, FirstActivity.class);
                                 startActivity(firstActivityIntent);
                                 finish();
+
+                                // 넘겨줬으니 기준값은 다시 0으로
                                 criteriaNumber = 0;
-                                System.out.println("criteriaNumber 확인 4: " + criteriaNumber);
-                            } else if (criteriaNumber == 0) {
+                                System.out.println("LoginActivity criteriaNumber 확인 4: " + criteriaNumber);
+                            }
+
+                            else if (criteriaNumber == 0) {
                                 Toast.makeText(LoginActivity.this, "존재하지 않는 계정입니다.\n관리자에게 문의바랍니다.", Toast.LENGTH_SHORT).show();
+                                // 마찬가지로 로그아웃이 아니라 인텐트를 넘겨야 겠는데?
                                 FirebaseAuth.getInstance().signOut();
                             }
                         } else {
@@ -286,6 +316,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // 액티비티가 띄워질 경우 자동으로 실행하는 메소드입니다.
+    // 액티비티 생명주기 참조
     @Override
     protected void onStart() {
         super.onStart();
@@ -293,6 +324,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // 타 액티비티 전환 시 동작입니다.
+    // 없으면 onStart()에 걸려서 중복 동작됨
     @Override
     protected void onPause() {
         super.onPause();

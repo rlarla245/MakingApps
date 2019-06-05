@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -31,12 +31,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SignUpActivity extends AppCompatActivity {
-    // 권한 코드
-    private static final int PICK_FROM_ALBUM = 10;
+    // 권한 코드 - 이미지 불러오기
     private static final int PICK_IMAGE_FROM_ALBUM = 0;
 
     // 각각의 UI 변수들을 생성합니다.
@@ -46,6 +42,8 @@ public class SignUpActivity extends AppCompatActivity {
     public EditText phoneNumberEdit;
     public Button signupButton;
     public ImageView profileImage;
+
+    // 프로필 이미지 uri를 담습니다.
     public Uri profileImageUri;
 
     @Override
@@ -54,12 +52,12 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         // 변수 호출
-        idEdit = (EditText)findViewById(R.id.signup_edittext_id);
-        emailEdit = (EditText)findViewById(R.id.signup_edittext_email);
-        passwordEdit = (EditText)findViewById(R.id.signup_edittext_password);
-        phoneNumberEdit = (EditText)findViewById(R.id.signup_edittext_phonenumber);
-        signupButton = (Button)findViewById(R.id.signupactivity_button_signup);
-        profileImage = (ImageView)findViewById(R.id.signupactivity_imageview);
+        idEdit = (EditText) findViewById(R.id.signup_edittext_id);
+        emailEdit = (EditText) findViewById(R.id.signup_edittext_email);
+        passwordEdit = (EditText) findViewById(R.id.signup_edittext_password);
+        phoneNumberEdit = (EditText) findViewById(R.id.signup_edittext_phonenumber);
+        signupButton = (Button) findViewById(R.id.signupactivity_button_signup);
+        profileImage = (ImageView) findViewById(R.id.signupactivity_imageview);
 
         // 권한 요청 하는 부분 - 외부 저장소를 읽을 수 있는 권한을 요청합니다.
         // 요청 코드를 통해 onActivityResult 메소드에서 처리합니다.
@@ -72,13 +70,14 @@ public class SignUpActivity extends AppCompatActivity {
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 권한 확인. 권한이 부여되어 있지 않은 경우 작동하지 않습니다.
                 if (ContextCompat.checkSelfPermission(SignUpActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
+                    // 앨범을 열고 사진을 선택합니다.
                     Intent pickIntent = new Intent(Intent.ACTION_PICK);
                     pickIntent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                     startActivityForResult(pickIntent, PICK_IMAGE_FROM_ALBUM);
-                }
-                else {
+                } else {
                     Toast.makeText(SignUpActivity.this, "권한이 필요합니다.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -102,6 +101,7 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 중복 입력 방지를 위해 메소드 실행 중 동작을 강제로 멈춥니다.
+                // 예외 처리 코드 작성해서 사실상 없어도 되는 메소드
                 signupButton.setEnabled(false);
 
                 // 각각의 입력창 중 하나라도 공백일 경우 해당 메시지를 출력합니다.
@@ -126,11 +126,13 @@ public class SignUpActivity extends AppCompatActivity {
                 // 이미지를 입력하지 않았을 경우
                 if (profileImageUri == null) {
                     Toast.makeText(SignUpActivity.this, "사진을 입력해주세요.", Toast.LENGTH_SHORT).show();
+
                     // 마찬가지
                     signupButton.setEnabled(true);
                     return;
                 }
 
+                // 예외 사유가 없을 경우 계정을 생성합니다.
                 else {
                     createUsers();
                 }
@@ -138,6 +140,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+    // 아래와 같이 처리해도 상관없긴 함
     /*
     String checkEmail() {
         // 1. 이메일 중복 여부를 확인하기 위해 이메일 데이터들을 데이터베이스에서 불러옵니다.
@@ -171,7 +174,8 @@ public class SignUpActivity extends AppCompatActivity {
     void createUsers() {
         // 이메일, 패스워드로만 확인이 가능 -> 계정 생성합니다.
         FirebaseAuth.getInstance()
-                .createUserWithEmailAndPassword(emailEdit.getText().toString().trim(), passwordEdit.getText().toString().trim())
+                .createUserWithEmailAndPassword(emailEdit.getText().toString().trim(),
+                        passwordEdit.getText().toString().trim())
                 // 회원가입 성공 시
                 .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -182,16 +186,22 @@ public class SignUpActivity extends AppCompatActivity {
                                 // 실패할 경우 예외 처리를 실시합니다... 라는 뜻으로 보입니다?
                                 throw task.getException();
 
-                            } catch (FirebaseAuthUserCollisionException e) {
+                            }
+                            // 계정이 중복될 경우
+                            catch (FirebaseAuthUserCollisionException e) {
                                 Toast.makeText(SignUpActivity.this, "이미 존재하는 이메일입니다.", Toast.LENGTH_SHORT).show();
                                 signupButton.setEnabled(true);
 
-                            } catch (Exception e2) {
-                                Toast.makeText(SignUpActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
+                            }
+                            // 그 외 에러 사항을 메시지로 출력합니다.
+                            catch (Exception e2) {
+                                System.out.println("SignUpActivity 회원가입 오류: " + task.getException().toString());
+                                Toast.makeText(SignUpActivity.this, "회원가입 오류: " + task.getException().toString(), Toast.LENGTH_SHORT).show();
                                 signupButton.setEnabled(true);
                             }
                         }
 
+                        // 결격 사유 없음
                         else {
                             Toast.makeText(SignUpActivity.this, "데이터베이스 입력 중 입니다.", Toast.LENGTH_SHORT).show();
 
@@ -204,12 +214,17 @@ public class SignUpActivity extends AppCompatActivity {
                             task.getResult().getUser().updateProfile(userProfileChangeRequest);
 
                             FirebaseStorage.getInstance().getReference()
-                                    .child("userImages").child(uid).putFile(profileImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                    .child("userImages").child(uid)
+                                    // uri 입력
+                                    .putFile(profileImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                     // 프로필 이미지 다운로드 url
+                                    // 스토리지에 찍히고 난 뒤 해당 다운로드 uri를 불러옵니다.
+                                    // 디바이스 내 사진 정보와는 다름
                                     String imageUri = task.getResult().getDownloadUrl().toString();
 
+                                    // 데이터베이스에도 찍어줍니다.
                                     final UserModel userModel = new UserModel();
                                     userModel.userName = idEdit.getText().toString();
                                     userModel.userPhoneNumber = phoneNumberEdit.getText().toString();
@@ -226,19 +241,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                     Toast.makeText(SignUpActivity.this, "회원가입이 완료되었습니다!", Toast.LENGTH_SHORT).show();
                                                     finish();
                                                 }
-                                            }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            /*
-                                            // 유저 이메일 데이터 테이블 생성
-                                            UserEmailsModel userEmailsModel = new UserEmailsModel();
-                                            userEmailsModel.userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-
-                                            // 해당 유저 uid에 입력
-                                            FirebaseDatabase.getInstance().getReference().child("userEmails").child(uid).setValue(userEmailsModel);
-                                            */
-                                        }
-                                    });
+                                            });
                                 }
                             });
                         }
@@ -248,13 +251,16 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // 권한 받고 갑시다.
         super.onActivityResult(requestCode, resultCode, data);
 
+        // 앨범 권한을 받은 경우 + 사진을 불러온 경우
         if (requestCode == PICK_IMAGE_FROM_ALBUM && resultCode == RESULT_OK) {
+            // 이미지 뷰에 선택한 사진을 띄워줍니다.
             Glide.with(this).load(data.getData())
                     .apply(new RequestOptions().circleCrop()).into(profileImage);
+
             // 이미지 경로 원본 저장
+            // 스토리지에 업로드 하기 위한 디바이스 내 사진 정보입니다.
             profileImageUri = data.getData();
         }
     }

@@ -43,13 +43,14 @@ import static android.app.Activity.RESULT_OK;
 
 public class AccountFragment extends Fragment {
     private static final int PICK_IMAGE_FROM_ALBUM = 0;
-    public Uri profileImageUri;
     public String uid;
+
     // 변수 호출
     ImageView imageView_profileimage;
     TextView userName;
     TextView userPhoneNumber;
     TextView textView_message;
+
     private FirebaseStorage storage;
 
     @Nullable
@@ -57,6 +58,7 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.account_fragment, container, false);
 
+        // 왜 두 번 쓰냐
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         storage = FirebaseStorage.getInstance();
@@ -81,6 +83,7 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        // 상태 메시지 수정
         final ImageButton imageButton = (ImageButton) view.findViewById(R.id.accountfragment_imagebutton_changestatusmessage);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +93,9 @@ public class AccountFragment extends Fragment {
         });
 
         // 데이터베이스 접근
-        FirebaseDatabase.getInstance().getReference().child("users").child(myUid).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("users")
+                // 내 uid에 맞는 데이터 접근
+                .child(myUid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserModel userModel = dataSnapshot.getValue(UserModel.class);
@@ -105,9 +110,9 @@ public class AccountFragment extends Fragment {
                     imageButton.setVisibility(View.VISIBLE);
 
                     // 휴대폰 번호 출력
+                    // "-"를 입력하기 위함입니다.
                     String a = new String(userModel.userPhoneNumber);
                     StringBuffer phoneNumber = new StringBuffer(a);
-
 
                     if (phoneNumber.length() == 11) {
                         phoneNumber.insert(3, '-');
@@ -115,7 +120,10 @@ public class AccountFragment extends Fragment {
 
                         userPhoneNumber.setText(phoneNumber);
                         userPhoneNumber.setVisibility(View.VISIBLE);
-                    } else {
+                    }
+
+                    // "-"가 있을 경우
+                    else {
                         userPhoneNumber.setText(phoneNumber);
                         userPhoneNumber.setVisibility(View.VISIBLE);
                     }
@@ -148,12 +156,14 @@ public class AccountFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_FROM_ALBUM && resultCode == RESULT_OK) {
+            // 왜 이런 식으로 처리했지?
             StorageReference storageRef
                     = storage.getReferenceFromUrl("gs://chattingapp-aa575.appspot.com");
 
-            // 4. 다음과 같이 정상적으로 경로를 받아옵니다.
+            // 다음과 같이 정상적으로 경로를 받아옵니다.
             Uri file = Uri.fromFile(new File(getPath(data.getData())));
             StorageReference riversRef
+                    // userImages에 넣어야 할 것 같은데?
                     = storageRef.child("images/" + file.getLastPathSegment());
             UploadTask uploadTask = riversRef.putFile(file);
 

@@ -66,6 +66,7 @@ public class SelectPeopleActivity extends AppCompatActivity {
         // 플로팅 버튼 호출
         floatingActionButton = (FloatingActionButton) findViewById(R.id.selectpeopleactivity_floatingbutton);
 
+        // 채팅방 정보, uid 값을 불러옵니다.
         FirebaseDatabase.getInstance().getReference().child("chatrooms")
                 .addValueEventListener(new ValueEventListener() {
             @Override
@@ -100,7 +101,6 @@ public class SelectPeopleActivity extends AppCompatActivity {
                     // 내 uid도 입력해야합니다.
                     String myUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                    // push는 해당하는 방을 만드는 메소드, setValue는 데이터를 데이터베이스에 입력하는 메소드입니다.
                     chatModel.users.put(myUid, true);
 
                     // DB 내 모든 채팅방을 받아옵니다.
@@ -109,20 +109,24 @@ public class SelectPeopleActivity extends AppCompatActivity {
                         ArrayList<String> testRoomUsers = new ArrayList<>();
                         ArrayList<String> testChatUsers = new ArrayList<>();
 
+                        // 채팅방 내 유저들 불러옵니다.
                         for (String users : chatRoomFromDB.get(i).users.keySet()) {
                             testRoomUsers.add(users);
                         }
 
+                        // 선택한 유저들의 집합
                         for (String users : chatModel.users.keySet()) {
                             testChatUsers.add(users);
                         }
 
+                        // 기존에 존재하는 채팅방인가?
                         if (testRoomUsers.toString().equals(testChatUsers.toString())) {
                             Intent intent = null;
 
                             String roomUid = chatRoomUidFromDB.get(i);
                             Toast.makeText(SelectPeopleActivity.this, "이미 존재하는 채팅방입니다.\n채팅방으로 이동합니다.", Toast.LENGTH_SHORT).show();
 
+                            // 존재하는 단체 채팅방이므로, 해당 채팅방으로 인텐트를 넘겨줍니다.
                             intent = new Intent(v.getContext(), GroupMessageActivity.class);
 
                             // 방의 key 값(uid)을 넘겨주는 의미입니다.
@@ -139,13 +143,14 @@ public class SelectPeopleActivity extends AppCompatActivity {
                                 startActivity(intent);
                             }
 
+                            // 존재하는 채팅방입니다.
                             criteriaNumber = 1;
                             break;
                         }
                     }
 
                     // 채팅방을 새로 생성하는 경우 해당 유저들이 있는 채팅방으로 이동시킵니다.
-                    if (criteriaNumber == 0) {
+                        if (criteriaNumber == 0) {
                         Toast.makeText(SelectPeopleActivity.this, "채팅방이 생성되었습니다.", Toast.LENGTH_SHORT).show();
                         FirebaseDatabase.getInstance().getReference().child("chatrooms").push().setValue(chatModel)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -157,14 +162,19 @@ public class SelectPeopleActivity extends AppCompatActivity {
                                             ArrayList<String> testRoom2Users = new ArrayList<>();
                                             ArrayList<String> testChat2Users = new ArrayList<>();
 
+                                            // 존재하는 채팅방
                                             for (String users : chatRoomFromDB.get(i).users.keySet()) {
                                                 testRoom2Users.add(users);
                                             }
 
+                                            // 생성한 채팅방
                                             for (String users : chatModel.users.keySet()) {
                                                 testChat2Users.add(users);
                                             }
 
+                                            // 사실 존재하지 않는 채팅방을 생성하는 거라 이럴 필요가 없긴 한데
+                                            // 단체 채팅방을 채팅방 uid로 이동시키고 있기 때문에 이러한 과정이
+                                            // 불필요하게 생성됨. db에 채팅방 생성하고 그 uid값 바로 불러오면 상관없음
                                             if (testRoom2Users.toString().equals(testChat2Users.toString())) {
                                                 Intent intent = null;
                                                 String roomUid = chatRoomUidFromDB.get(i);
@@ -192,6 +202,7 @@ public class SelectPeopleActivity extends AppCompatActivity {
                         // finish();
                     }
 
+                    // 모든 과정을 마쳤으므로
                     // 다시 원래대로
                     criteriaNumber = 0;
                 }
@@ -199,6 +210,8 @@ public class SelectPeopleActivity extends AppCompatActivity {
         });
     }
 
+    // 어댑터 설정
+    // 친구 목록을 불러옵니다.
     class SelectPeopleRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         List<UserModel> userModels;
 
@@ -261,6 +274,7 @@ public class SelectPeopleActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Intent chat_intent = new Intent(view.getContext(), MessageActivity.class);
                     chat_intent.putExtra("destinationUid", userModels.get(position).uid);
+
                     // 젤리빈 이상부터 적용합니다. 애니메이션 효과를 줘서 액티비티를 전환합니다.
                     ActivityOptions activityOptions = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -289,7 +303,7 @@ public class SelectPeopleActivity extends AppCompatActivity {
                         partnerCount += 1;
 
                     } else {
-                        //체크 취소 상태
+                        // 체크 취소 상태
                         chatModel.users.remove(userModels.get(position).uid);
                         partnerCount -= 1;
                     }
